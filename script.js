@@ -70,26 +70,29 @@ async function mostrarCapitulos(id, sNum, sName) {
     `).join('');
 }
 
-// SOLUCIÓN AL ERROR DE VÍDEO: Tunelización y Escudo Sandbox
 function reproducir(id, tipo, s=1, e=1) {
     const holder = document.getElementById('video-container');
     const audio = document.getElementById('audio-selector').value;
     document.getElementById('player-view').style.display = 'block';
-    holder.innerHTML = ""; 
+    
+    // Limpieza profunda para forzar el refresco del hardware de video
+    holder.innerHTML = `<div class="flex items-center justify-center h-full text-cyan-400 animate-pulse font-black text-xs">CONECTANDO A DABO VISION...</div>`; 
 
+    // Usamos un servidor espejo (vidsrc.pm) que es más estable para GitHub Pages
     const url = tipo === 'movie' ? 
-        `https://vidsrc.icu/embed/movie/${id}?lang=${audio}` : 
-        `https://vidsrc.icu/embed/tv/${id}/${s}/${e}?lang=${audio}`;
+        `https://vidsrc.pm/embed/movie/${id}?lang=${audio}` : 
+        `https://vidsrc.pm/embed/tv/${id}/${s}/${e}?lang=${audio}`;
     
-    const ifrm = document.createElement("iframe");
-    ifrm.src = url;
-    ifrm.className = "w-full h-full border-0";
-    ifrm.setAttribute("allowfullscreen", "true");
-    
-    // ESCUDO ANTI-ANUNCIOS: Solo permite ejecución de video y scripts internos
-    ifrm.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-presentation");
-    
-    holder.appendChild(ifrm);
+    setTimeout(() => {
+        holder.innerHTML = ""; 
+        const ifrm = document.createElement("iframe");
+        ifrm.src = url;
+        ifrm.className = "w-full h-full border-0";
+        ifrm.setAttribute("allowfullscreen", "true");
+        // Escudo de seguridad DaBo.03: permite solo lo necesario para el video
+        ifrm.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-presentation");
+        holder.appendChild(ifrm);
+    }, 800);
 }
 
 function cerrarSerie() { document.getElementById('series-menu').style.display = 'none'; }
