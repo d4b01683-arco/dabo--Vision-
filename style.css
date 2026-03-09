@@ -1,24 +1,23 @@
 :root { --accent: #00e5ff; --bg: #000; }
-body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; }
 ::-webkit-scrollbar { display: none; }
 
 .movie-card { 
-    min-width: 140px; height: 210px; border-radius: 12px; 
+    min-width: 150px; height: 220px; border-radius: 15px; 
     background-size: cover; background-position: center; 
-    flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); 
-    transition: 0.4s; cursor: pointer; 
+    flex-shrink: 0; position: relative; border: 1px solid rgba(255,255,255,0.05); 
+    transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer; 
 }
-.movie-card:hover { transform: scale(1.1); border-color: var(--accent); z-index: 100; box-shadow: 0 0 20px rgba(0,229,255,0.3); }
+.movie-card:hover { transform: scale(1.1); z-index: 50; border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2); }
 
-.video-row { display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px 40px; }
+.video-row { display: flex; gap: 15px; overflow-x: auto; padding: 15px 25px 35px; scroll-behavior: smooth; }
 
-.overlay { 
-    display: none; position: fixed; inset: 0; 
-    background: #000; z-index: 100000; overflow-y: auto; 
-}
+.overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 100000; overflow-y: auto; }
 
 .glass-btn { 
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-    padding: 18px; border-radius: 16px; transition: 0.3s; 
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); 
+    padding: 16px; border-radius: 16px; transition: 0.3s; 
 }
-.glass-btn:hover { background: var(--accent); color: #000; }
+.glass-btn:hover { background: var(--accent); color: #000; font-weight: bold; }
+
+#revenue-engine { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
