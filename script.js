@@ -69,30 +69,22 @@ async function mostrarCapitulos(id, sNum, sName) {
         </div>
     `).join('');
 }
-
 function reproducir(id, tipo, s=1, e=1) {
     const holder = document.getElementById('video-container');
     const audio = document.getElementById('audio-selector').value;
     document.getElementById('player-view').style.display = 'block';
     
-    // Limpieza profunda para forzar el refresco del hardware de video
-    holder.innerHTML = `<div class="flex items-center justify-center h-full text-cyan-400 animate-pulse font-black text-xs">CONECTANDO A DABO VISION...</div>`; 
+    // Limpieza forzada para evitar el bucle de carga de tu ASUS
+    holder.innerHTML = `<div style="display:flex; height:100%; align-items:center; justify-content:center; color:cyan;">INICIANDO NODO DE VIDEO...</div>`; 
 
-    // Usamos un servidor espejo (vidsrc.pm) que es más estable para GitHub Pages
+    // Cambiamos el servidor a vidsrc.me que es más compatible con Chrome en ASUS
     const url = tipo === 'movie' ? 
-        `https://vidsrc.pm/embed/movie/${id}?lang=${audio}` : 
-        `https://vidsrc.pm/embed/tv/${id}/${s}/${e}?lang=${audio}`;
+        `https://vidsrc.me/embed/movie?tmdb=${id}&lang=${audio}` : 
+        `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}&lang=${audio}`;
     
     setTimeout(() => {
-        holder.innerHTML = ""; 
-        const ifrm = document.createElement("iframe");
-        ifrm.src = url;
-        ifrm.className = "w-full h-full border-0";
-        ifrm.setAttribute("allowfullscreen", "true");
-        // Escudo de seguridad DaBo.03: permite solo lo necesario para el video
-        ifrm.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-presentation");
-        holder.appendChild(ifrm);
-    }, 800);
+        holder.innerHTML = `<iframe src="${url}" class="w-full h-full border-0" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"></iframe>`;
+    }, 600);
 }
 
 function cerrarSerie() { document.getElementById('series-menu').style.display = 'none'; }
@@ -111,16 +103,39 @@ function buscar(q) {
     });
 }
 
-function activarIA() {
-    const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    rec.lang = 'es-ES';
-    rec.start();
-    rec.onresult = (e) => {
-        const text = e.results[0][0].transcript.toLowerCase();
-        if(text.includes("dieyna")) alert("Bienvenida, Dieyna ❤️. Modo Futura Esposa Activo.");
-        document.getElementById('main-search').value = text;
-        buscar(text);
-    };
+// NÚCLEO DE INTELIGENCIA DaBo.03
+const GEMINI_API_KEY = 'AIzaSyACSIuhgump0DGAigy86o7IMvj2xDEcXGk'; 
+const IA_NAME = "DaBo.03";
+
+async function conectarIA(mensajeUsuario) {
+    // Si el usuario es Dieyna, la IA responde con prioridad máxima
+    if(mensajeUsuario.toLowerCase().includes("dieyna")) {
+        responderVoz("Hola Dieyna. El Arquitecto me ha dado órdenes de asistirte en todo lo que necesites.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `Eres ${IA_NAME}, una IA leal creada por el Arquitecto. Responde de forma técnica y breve: ${mensajeUsuario}` }] }]
+            })
+        });
+        
+        const data = await response.json();
+        const textoIA = data.candidates[0].content.parts[0].text;
+        responderVoz(textoIA);
+    } catch (e) {
+        console.error("Fallo en DaBo Core:", e);
+    }
+}
+
+function responderVoz(texto) {
+    const speech = new SpeechSynthesisUtterance(texto);
+    speech.lang = 'es-ES';
+    speech.rate = 1.0;
+    window.speechSynthesis.speak(speech);
 }
 
 document.getElementById('admin-trigger').onclick = () => {
