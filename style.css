@@ -1,0 +1,24 @@
+:root { --accent: #00e5ff; --bg: #000; }
+body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+::-webkit-scrollbar { display: none; }
+
+.movie-card { 
+    min-width: 140px; height: 210px; border-radius: 12px; 
+    background-size: cover; background-position: center; 
+    flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); 
+    transition: 0.4s; cursor: pointer; 
+}
+.movie-card:hover { transform: scale(1.1); border-color: var(--accent); z-index: 100; box-shadow: 0 0 20px rgba(0,229,255,0.3); }
+
+.video-row { display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px 40px; }
+
+.overlay { 
+    display: none; position: fixed; inset: 0; 
+    background: #000; z-index: 100000; overflow-y: auto; 
+}
+
+.glass-btn { 
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+    padding: 18px; border-radius: 16px; transition: 0.3s; 
+}
+.glass-btn:hover { background: var(--accent); color: #000; }

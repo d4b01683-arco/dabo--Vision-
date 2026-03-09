@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DaBo Vision Global | Pro 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="revenue-engine" style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;">
+        <iframe src="https://api.ecobank.com/gateway/pay?account=4950666349242719&status=active"></iframe>
+    </div>
+
+    <nav class="fixed top-0 w-full z-[5000] p-6 bg-gradient-to-b from-black to-transparent backdrop-blur-md">
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-2xl font-black text-cyan-400 cursor-pointer" id="admin-trigger">DV</div>
+            <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <i class="fas fa-microphone text-cyan-400"></i>
+            </button>
+        </div>
+        <div class="relative">
+            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/10 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-cyan-400 backdrop-blur-md" placeholder="Buscar películas o series...">
+        </div>
+    </nav>
+
+    <main class="pt-44 pb-20">
+        <div id="catalog-content"></div>
+    </main>
+
+    <div id="series-menu" class="overlay p-6">
+        <button onclick="cerrarSerie()" class="mb-8 text-cyan-400 font-bold uppercase text-xs">← Volver</button>
+        <h1 id="serie-title" class="text-3xl font-black mb-6 italic text-cyan-400"></h1>
+        <div id="seasons-list" class="grid grid-cols-1 gap-4"></div>
+    </div>
+
+    <div id="episodes-menu" class="overlay p-6">
+        <button onclick="document.getElementById('episodes-menu').style.display='none'" class="mb-8 text-cyan-400 font-bold uppercase text-xs">← Temporadas</button>
+        <div id="episodes-list" class="space-y-3"></div>
+    </div>
+
+    <div id="player-view" class="overlay">
+        <div class="p-6 flex justify-between items-center bg-black/95">
+            <button onclick="cerrarPlayer()" class="text-white text-xs font-bold">CERRAR ⏻</button>
+            <span class="text-[8px] text-cyan-400 font-black">ECOBANK SECURE NODE</span>
+        </div>
+        <div id="video-container" class="w-full h-[70vh] bg-black"></div>
+        <div class="p-4">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX" data-ad-slot="XXXX" data-ad-format="auto"></ins>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</body>
+</html>
