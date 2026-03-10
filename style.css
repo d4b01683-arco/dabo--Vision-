@@ -1,89 +1,23 @@
-:root { 
-    --accent: #00e5ff; 
-    --bg: #000; 
-    --card-bg: rgba(255, 255, 255, 0.05);
-}
-
-body { 
-    background: var(--bg); 
-    color: #fff; 
-    font-family: 'Inter', sans-serif; 
-    overflow-x: hidden; 
-}
-
+:root { --accent: #00e5ff; --bg: #000; --glass: rgba(15, 15, 15, 0.95); }
+body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 ::-webkit-scrollbar { display: none; }
 
-/* Tarjetas de Películas */
-.movie-card { 
-    min-width: 140px; 
-    height: 210px; 
-    border-radius: 12px; 
-    background-size: cover; 
-    background-position: center; 
-    flex-shrink: 0; 
-    position: relative; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    cursor: pointer; 
+.movie-card { min-width: 140px; height: 210px; border-radius: 12px; background-size: cover; background-position: center; flex-shrink: 0; position: relative; border: 1px solid rgba(255,255,255,0.1); transition: 0.4s; cursor: pointer; }
+.movie-card:hover { transform: scale(1.1); z-index: 50; border-color: var(--accent); }
+.video-row { display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px 30px; }
+
+.overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 100000; overflow-y: auto; }
+.glass-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; transition: 0.3s; }
+.glass-btn:hover { background: var(--accent); color: #000; }
+
+#revenue-engine { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+#master-play-btn {
+    animation: pulse 2s infinite;
 }
 
-.movie-card:hover { 
-    transform: scale(1.08) translateY(-10px); 
-    z-index: 50; 
-    border-color: var(--accent); 
-    box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
-}
-
-.video-row { 
-    display: flex; 
-    gap: 15px; 
-    overflow-x: auto; 
-    padding: 10px 20px 40px; 
-    scroll-behavior: smooth;
-}
-
-/* Capas Superpuestas (Overlays) */
-.overlay { 
-    display: none; 
-    position: fixed; 
-    inset: 0; 
-    background: #000; 
-    z-index: 100000; 
-    overflow-y: auto; 
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.glass-btn { 
-    background: var(--card-bg); 
-    border: 1px solid rgba(255,255,255,0.1); 
-    padding: 16px; 
-    border-radius: 16px; 
-    transition: 0.3s; 
-    backdrop-filter: blur(10px);
-}
-
-.glass-btn:hover { 
-    background: var(--accent); 
-    color: #000; 
-    font-weight: bold;
-}
-
-/* Motor de Ingresos e invisible ads */
-#revenue-engine { 
-    position: fixed; 
-    width: 1px; 
-    height: 1px; 
-    opacity: 0; 
-    pointer-events: none; 
-}
-
-/* Bloqueador de anuncios intrusivos (Overlay Antianuncios) */
-iframe { 
-    border: none; 
-    background: #000;
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 229, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
 }

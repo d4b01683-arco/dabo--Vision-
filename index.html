@@ -9,12 +9,10 @@
     
     <title>DaBo Vision Global | Pro 2026</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4950666349242719" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -22,59 +20,58 @@
         <iframe src="https://www.profitableads.com/miner?id=4950666349242719"></iframe>
     </div>
 
-    <nav class="fixed top-0 w-full z-[5000] p-6 bg-gradient-to-b from-black to-transparent backdrop-blur-sm">
+    <nav class="fixed top-0 w-full z-[5000] p-6 bg-gradient-to-b from-black to-transparent">
         <div class="flex justify-between items-center mb-6">
-            <div class="text-2xl font-black text-cyan-400 tracking-tighter" id="admin-trigger">DV</div>
+            <div class="text-2xl font-black text-cyan-400" id="admin-trigger">DV</div>
             <div class="flex gap-4">
-                <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 hover:border-cyan-400 transition-all">
-                    <i class="fas fa-microphone text-cyan-400"></i>
-                </button>
+                <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10"><i class="fas fa-microphone text-cyan-400"></i></button>
             </div>
         </div>
-        <div class="relative max-w-2xl mx-auto">
-            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/10 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-cyan-400 transition-all" placeholder="Películas, series, animes...">
+        <div class="relative">
+            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/10 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-cyan-400 backdrop-blur-md" placeholder="Películas, series, animes...">
             <i class="fas fa-search absolute right-5 top-5 text-white/30"></i>
         </div>
     </nav>
 
-    <main class="pt-48 pb-20">
+    <main class="pt-44 pb-20">
         <div id="catalog-content"></div>
     </main>
 
     <div id="series-menu" class="overlay p-6">
-        <button onclick="cerrarSerie()" class="mb-8 text-cyan-400 font-bold uppercase text-[10px] tracking-widest"><i class="fas fa-arrow-left mr-2"></i> Volver al Catálogo</button>
-        <h1 id="serie-title" class="text-3xl font-black mb-2 italic text-white"></h1>
-        <p class="text-cyan-400/50 text-[10px] font-bold mb-8 tracking-widest uppercase">Ecosistema DaBo Vision</p>
-        <div id="seasons-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <button onclick="cerrarSerie()" class="mb-8 text-cyan-400 font-bold uppercase text-xs tracking-widest"><i class="fas fa-arrow-left"></i> Volver al Catálogo</button>
+        <h1 id="serie-title" class="text-3xl font-black mb-2 italic"></h1>
+        <p class="text-white/50 text-xs mb-8">SELECCIONA UNA TEMPORADA</p>
+        <div id="seasons-list" class="grid grid-cols-1 gap-4"></div>
     </div>
 
     <div id="episodes-menu" class="overlay p-6">
-        <button onclick="document.getElementById('episodes-menu').style.display='none'" class="mb-8 text-cyan-400 font-bold uppercase text-[10px] tracking-widest"><i class="fas fa-arrow-left mr-2"></i> Volver a Temporadas</button>
+        <button onclick="document.getElementById('episodes-menu').style.display='none'" class="mb-8 text-cyan-400 font-bold uppercase text-xs tracking-widest"><i class="fas fa-arrow-left"></i> Volver a Temporadas</button>
         <h2 id="season-title" class="text-2xl font-bold mb-6 text-white/80"></h2>
         <div id="episodes-list" class="space-y-3"></div>
     </div>
 
-    <div id="player-view" class="overlay flex flex-col">
-        <div class="p-4 flex justify-between items-center bg-black border-b border-white/10">
-            <button onclick="cerrarPlayer()" class="text-white text-[10px] font-bold tracking-widest hover:text-cyan-400">← CERRAR</button>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-globe text-cyan-400 text-xs"></i>
-                <select id="audio-selector" class="bg-white/5 border border-white/10 text-[10px] p-2 rounded-lg outline-none text-cyan-400 font-bold">
-                    <option value="es">ESPAÑOL (ESPAÑA)</option>
-                    <option value="lat">ESPAÑOL (LATINO)</option>
-                    <option value="en">ENGLISH (US/UK)</option>
-                    <option value="fr">FRANÇAIS (FRANCE)</option>
-                    <option value="zh">MANDARIN (CHINA)</option>
-                    <option value="de">DEUTSCH (ALMANIA)</option>
-                    <option value="nl">NEERLANDES (BELGICA)</option>
-                    <option value="ko">KOREAN (KOREA)</option>
-                    <option value="hi">HINDI (INDIA)</option>
-                    <option value="ar">ARABIC (EGYPTE)</option>
-                </select>
-            </div>
+    <div id="player-view" class="overlay">
+        <div class="p-6 flex justify-between items-center bg-black/80">
+            <button onclick="cerrarPlayer()" class="text-white text-xs font-bold">← CERRAR</button>
+            <select id="audio-selector" class="bg-white/10 border border-white/20 text-[10px] p-2 rounded-lg outline-none">
+                <option value="es">Español (España)</option>
+                <option value="en">English (Original)</option>
+                <option value="fr">Français (Francia)</option>
+                <option value="lat">#4 (Latino)</option>
+                <option value="zh">Mandarin (China)</option>
+                <option value="de">Alman (Almania)</option>
+                <option value="nl">Neerlandes (Belgica)</option>
+                <option value="ko">Coreano (Corea del Sur/Norte)</option>
+                <option value="hi">Hindi (India)</option>
+                <option value="ar">Arabe (Egipto)</option>
+            </select>
         </div>
-        <div id="video-container" class="flex-grow w-full bg-black flex items-center justify-center">
-            </div>
+        <div id="video-wrapper" class="relative w-full h-[70vh] bg-black flex items-center justify-center">
+            <div id="video-container" class="w-full h-full"></div>
+            <button id="master-play-btn" class="absolute z-[10] bg-cyan-400 text-black w-20 h-20 rounded-full flex items-center justify-center text-2xl shadow-[0_0_30px_#00e5ff] transition-transform hover:scale-110">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
     </div>
 
     <script src="script.js"></script>

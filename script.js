@@ -1,70 +1,52 @@
 const TMDB_KEY = 'a6178823f5e2f865dfd88e8cade51391';
-const genres = [
-    "estrenos nuevos", "películas", "series", "animes", "acción", "comedia", 
-    "terror", "ciencia y ficción", "fantasía", "romance", "infantil"
-];
+const genres = ["estrenos nuevos", "películas", "series", "animes", "acción", "comedia", "terror", "cine", "ciencia y ficción", "fantasía", "romance"];
 
-// Sistema de ingresos persistente
 let revenue = parseFloat(localStorage.getItem('dabo_revenue')) || 1240.50;
 
-window.onload = () => { 
-    renderHome(); 
-    console.log("DaBo Vision Global Pro 2026 - Conectado a dabo-vision.net");
-};
+window.onload = () => { renderHome(); };
 
-// Carga del Catálogo
 async function renderHome() {
     const container = document.getElementById('catalog-content');
     container.innerHTML = '';
-    
     for(let g of genres) {
         const row = document.createElement('div');
-        row.className = 'mb-12';
-        row.innerHTML = `
-            <h3 class="px-6 text-[10px] font-black uppercase text-cyan-400 mb-4 tracking-[0.2em] italic">${g}</h3>
-            <div class="video-row" id="row-${g.replace(/\s/g, '')}"></div>
-        `;
+        row.className = 'mb-8';
+        row.innerHTML = `<h3 class="px-6 text-[10px] font-black uppercase text-cyan-400 mb-2 tracking-widest">${g}</h3><div class="video-row" id="row-${g.replace(/\s/g, '')}"></div>`;
         container.appendChild(row);
         
         let searchTag = g === "estrenos nuevos" ? "trending/all/week" : `search/multi?query=${g}`;
-        
         fetch(`https://api.themoviedb.org/3/${searchTag}${searchTag.includes('?') ? '&' : '?'}api_key=${TMDB_KEY}&language=es-ES`)
-        .then(r => r.json())
-        .then(data => {
+        .then(r => r.json()).then(data => {
             const el = document.getElementById(`row-${g.replace(/\s/g, '')}`);
             el.innerHTML = data.results.filter(m => m.poster_path).map(m => `
                 <div class="movie-card" onclick="analizarContenido(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" style="background-image:url('https://image.tmdb.org/t/p/w400${m.poster_path}')">
-                    ${(m.media_type === 'tv' || m.name) ? '<div class="absolute top-2 right-2 bg-cyan-400 text-black text-[7px] font-black px-2 py-0.5 rounded shadow-lg">SERIE</div>' : ''}
+                    ${(m.media_type === 'tv' || m.name) ? '<div class="absolute top-2 right-2 bg-cyan-400 text-black text-[8px] font-bold px-2 py-1 rounded">SERIE</div>' : ''}
                 </div>
             `).join('');
         });
     }
 }
 
-// Lógica de Inicio de Contenido y Monetización
 async function analizarContenido(id, tipo) {
-    // Monetización: Se registra ingreso por cada intención de visualización
-    revenue += 0.25; 
-    localStorage.setItem('dabo_revenue', revenue.toFixed(2));
-
+    revenue += 0.20; // Monetización por clic
+    localStorage.setItem('dabo_revenue', revenue);
     if(tipo === 'tv') {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=es-ES`);
         const data = await res.json();
         mostrarSerie(data);
     } else {
-        reproducir(id, 'movie');
+        prepararReproductor(id, 'movie');
     }
 }
 
-// Gestión de Series
 function mostrarSerie(data) {
     document.getElementById('series-menu').style.display = 'block';
     document.getElementById('serie-title').innerText = data.name;
     const list = document.getElementById('seasons-list');
     list.innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `
-        <div class="glass-btn flex justify-between items-center cursor-pointer" onclick="mostrarCapitulos(${data.id}, ${s.season_number}, '${s.name}')">
-            <span class="font-bold text-sm tracking-tight">${s.name}</span>
-            <span class="text-[10px] bg-white/10 px-3 py-1 rounded-full text-cyan-400 uppercase font-black">${s.episode_count} EPS</span>
+        <div class="glass-btn flex justify-between items-center" onclick="mostrarCapitulos(${data.id}, ${s.season_number}, '${s.name}')">
+            <span>${s.name}</span>
+            <span class="text-[10px] text-white/40">${s.episode_count} Caps</span>
         </div>
     `).join('');
 }
@@ -76,37 +58,31 @@ async function mostrarCapitulos(serieId, seasonNum, seasonName) {
     document.getElementById('season-title').innerText = seasonName;
     const list = document.getElementById('episodes-list');
     list.innerHTML = data.episodes.map(e => `
-        <div class="glass-btn text-sm flex items-center justify-between group" onclick="reproducir(${serieId}, 'tv', ${seasonNum}, ${e.episode_number})">
-            <span><b class="text-cyan-400 mr-2">${e.episode_number}.</b> ${e.name}</span>
-            <i class="fas fa-play text-[10px] opacity-0 group-hover:opacity-100 transition-all"></i>
+        <div class="glass-btn text-sm" onclick="prepararReproductor(${serieId}, 'tv', ${seasonNum}, ${e.episode_number})">
+            <span class="text-cyan-400 font-bold">${e.episode_number}.</span> ${e.name}
         </div>
     `).join('');
 }
 
-// REPRODUCTOR MAESTRO: INICIO AUTOMÁTICO AL PULSAR
-function reproducir(id, tipo, s=1, e=1) {
-    const holder = document.getElementById('video-container');
-    document.getElementById('player-view').style.display = 'flex';
+// NUEVA FUNCIÓN CON BOTÓN DE PLAY
+function prepararReproductor(id, tipo, s=1, e=1) {
+    document.getElementById('player-view').style.display = 'block';
+    const playBtn = document.getElementById('master-play-btn');
+    const container = document.getElementById('video-container');
     
-    // Añadimos ?autoplay=1 para intentar forzar el inicio
-    const url = tipo === 'movie' ? 
-        `https://embed.su/embed/movie/${id}?autoplay=1` : 
-        `https://embed.su/embed/tv/${id}/${s}/${e}?autoplay=1`;
-    
-    // IMPORTANTE: Añadimos "controls" y permitimos "autoplay" en los atributos
-    holder.innerHTML = `
-        <iframe 
-            src="${url}" 
-            class="w-full h-full" 
-            allowfullscreen 
-            allow="autoplay; encrypted-media; picture-in-picture" 
-            sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
-            referrerpolicy="no-referrer">
-        </iframe>`;
+    playBtn.style.display = 'flex'; // Mostrar el botón
+    container.innerHTML = ''; // Limpiar previo
+
+    playBtn.onclick = () => {
+        playBtn.style.display = 'none'; // Ocultar al tocar
+        const url = tipo === 'movie' ? 
+            `https://vidsrc.icu/embed/movie/${id}` : 
+            `https://vidsrc.icu/embed/tv/${id}/${s}/${e}`;
+        
+        container.innerHTML = `<iframe src="${url}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe>`;
+    };
 }
 
-// Utilidades
-function cerrarSerie() { document.getElementById('series-menu').style.display = 'none'; }
 function cerrarPlayer() { 
     document.getElementById('player-view').style.display = 'none'; 
     document.getElementById('video-container').innerHTML = ''; 
@@ -117,22 +93,15 @@ function buscar(q) {
     fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${q}&language=es-ES`)
     .then(r => r.json()).then(d => {
         const content = document.getElementById('catalog-content');
-        content.innerHTML = `
-            <div class="px-6 py-4 flex justify-between items-center border-b border-white/10 mb-8">
-                <h3 class="text-[10px] font-black uppercase text-cyan-400">Resultados para: ${q}</h3>
-                <button onclick="renderHome()" class="text-[10px] font-bold text-white bg-white/10 px-4 py-2 rounded-full">LIMPIAR</button>
-            </div>
-            <div class="video-row">${d.results.filter(m=>m.poster_path).map(m => `
-                <div class="movie-card" onclick="analizarContenido(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" style="background-image:url('https://image.tmdb.org/t/p/w400${m.poster_path}')"></div>
-            `).join('')}</div>
-        `;
+        content.innerHTML = `<h3 class="px-6 text-xs text-white mb-4">RESULTADOS: ${q.toUpperCase()}</h3><div class="video-row">${d.results.filter(m=>m.poster_path).map(m => `
+            <div class="movie-card" onclick="analizarContenido(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" style="background-image:url('https://image.tmdb.org/t/p/w400${m.poster_path}')"></div>
+        `).join('')}</div><button onclick="renderHome()" class="m-6 text-[10px] text-cyan-400 border border-cyan-400/20 px-4 py-2 rounded-full">← VOLVER</button>`;
     });
 }
 
-// Panel del Arquitecto (PIN: 110103)
 document.getElementById('admin-trigger').onclick = () => {
     if(prompt("PIN ARQUITECTO:") === "110103") {
-        alert(`SISTEMA DA-BO VISION GLOBAL\n------------------\nIngresos Totales: $${revenue.toFixed(2)}\nDominio: dabo-vision.net\nStatus: Online`);
+        alert(`DV GLOBAL ANALYTICS\n------------------\nIngresos: $${revenue.toFixed(2)}\nStatus: dabo-vision.net ONLINE`);
     }
 };
 
@@ -142,6 +111,7 @@ function activarVoz() {
     rec.start();
     rec.onresult = (e) => {
         const text = e.results[0][0].transcript.toLowerCase();
+        if(text.includes("dieyna")) alert("Bienvenida, Dieyna ❤️");
         document.getElementById('main-search').value = text;
         buscar(text);
     };
