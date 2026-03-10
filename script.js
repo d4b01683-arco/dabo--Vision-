@@ -68,24 +68,30 @@ async function mostrarCapitulos(id, sNum, sName) {
             <span class="text-cyan-400 mr-2">${e.episode_number}.</span> ${e.name}
         </div>
     `).join('');
-}
 function reproducir(id, tipo, s=1, e=1) {
     const holder = document.getElementById('video-container');
     const audio = document.getElementById('audio-selector').value;
     document.getElementById('player-view').style.display = 'block';
     
-    // Limpieza forzada para evitar el bucle de carga de tu ASUS
-    holder.innerHTML = `<div style="display:flex; height:100%; align-items:center; justify-content:center; color:cyan;">INICIANDO NODO DE VIDEO...</div>`; 
+    // Limpieza de seguridad
+    holder.innerHTML = `<div style="color:cyan; text-align:center; padding-top:20%;">DABO CORE: SALTANDO BLOQUEO...</div>`;
 
-    // Cambiamos el servidor a vidsrc.me que es más compatible con Chrome en ASUS
+    // Servidor Nodo-XYZ (El más resistente actualmente)
     const url = tipo === 'movie' ? 
-        `https://vidsrc.me/embed/movie?tmdb=${id}&lang=${audio}` : 
-        `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}&lang=${audio}`;
-    
+        `https://vidsrc.xyz/embed/movie?tmdb=${id}&lang=${audio}` : 
+        `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}&lang=${audio}`;
+
     setTimeout(() => {
-        holder.innerHTML = `<iframe src="${url}" class="w-full h-full border-0" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"></iframe>`;
-    }, 600);
+        holder.innerHTML = `
+            <iframe 
+                src="${url}" 
+                style="width:100%; height:100%; border:none;" 
+                allowfullscreen="true"
+                referrerpolicy="no-referrer">
+            </iframe>`;
+    }, 500);
 }
+
 
 function cerrarSerie() { document.getElementById('series-menu').style.display = 'none'; }
 function cerrarPlayer() { document.getElementById('player-view').style.display = 'none'; document.getElementById('video-container').innerHTML = ''; }
