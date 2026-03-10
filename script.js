@@ -86,22 +86,21 @@ async function mostrarCapitulos(serieId, seasonNum, seasonName) {
 // REPRODUCTOR MAESTRO: INICIO AUTOMÁTICO AL PULSAR
 function reproducir(id, tipo, s=1, e=1) {
     const holder = document.getElementById('video-container');
-    const audio = document.getElementById('audio-selector').value;
     document.getElementById('player-view').style.display = 'flex';
     
-    // Servidor Bypass para dabo-vision.net (Evita bloqueos en ASUS)
-    // El servidor embed.su es el más estable para dominios .net en 2026
+    // Añadimos ?autoplay=1 para intentar forzar el inicio
     const url = tipo === 'movie' ? 
-        `https://embed.su/embed/movie/${id}` : 
-        `https://embed.su/embed/tv/${id}/${s}/${e}`;
+        `https://embed.su/embed/movie/${id}?autoplay=1` : 
+        `https://embed.su/embed/tv/${id}/${s}/${e}?autoplay=1`;
     
-    // Inserción limpia: Autoplay habilitado y sin cookies externas
+    // IMPORTANTE: Añadimos "controls" y permitimos "autoplay" en los atributos
     holder.innerHTML = `
         <iframe 
             src="${url}" 
             class="w-full h-full" 
             allowfullscreen 
-            allow="autoplay; encrypted-media" 
+            allow="autoplay; encrypted-media; picture-in-picture" 
+            sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
             referrerpolicy="no-referrer">
         </iframe>`;
 }
