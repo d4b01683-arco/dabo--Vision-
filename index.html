@@ -3,73 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google-site-verification" content="psNFBldyPO7Wc8XpJ0slxJErqUrQIiEWbdXsRqqJrN4" />
+    <meta name="referrer" content="no-referrer">
+    
     <title>DaBo Vision Global | Pro 2026</title>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-TU_ID_ADSENSE" crossorigin="anonymous"></script>
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <meta name="google-site-verification" content="psNFBldyPO7Wc8mXpJ0slxJErqUrQIiEWbdXsRqqJrN4" />
-    <meta name="referrer" content="no-referrer">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-TU_ID_ADSENSE" crossorigin="anonymous"></script>
 </head>
-<body>
+<body class="bg-black text-white">
 
     <div id="revenue-engine">
         <iframe src="https://www.profitableads.com/miner?id=4950666349242719"></iframe>
     </div>
 
-    <nav class="fixed top-0 w-full z-[5000] p-6 bg-gradient-to-b from-black via-black/80 to-transparent backdrop-blur-md">
+    <nav class="fixed top-0 w-full z-[5000] p-6 bg-gradient-to-b from-black via-black/80 to-transparent">
         <div class="flex justify-between items-center mb-6">
-            <div class="text-2xl font-black text-cyan-400 cursor-pointer" id="admin-trigger">DV</div>
+            <div class="text-2xl font-black text-cyan-400 tracking-tighter" id="admin-trigger">DV</div>
             <div class="flex gap-4">
-                <button onclick="activarIA()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-[0_0_15px_rgba(0,229,255,0.2)]">
                     <i class="fas fa-microphone text-cyan-400"></i>
                 </button>
             </div>
         </div>
         <div class="relative">
-            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/10 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-cyan-400" placeholder="Comanda a DaBo.03...">
+            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white outline-none focus:border-cyan-400 backdrop-blur-xl transition-all" placeholder="Películas, series, animes...">
             <i class="fas fa-search absolute right-5 top-5 text-white/30"></i>
         </div>
     </nav>
 
-    <main class="pt-44 pb-20">
-        <div class="max-w-4xl mx-auto mb-10 text-center opacity-40 text-[10px] tracking-widest uppercase">Publicidad Autorizada</div>
-        
+    <main class="pt-48 pb-20">
         <div id="catalog-content"></div>
     </main>
 
-    <div id="series-menu" class="overlay p-6">
-        <button onclick="cerrarSerie()" class="mb-8 text-cyan-400 font-bold uppercase text-xs tracking-widest">← Volver al Catálogo</button>
-        <h1 id="serie-title" class="text-3xl font-black mb-2 italic"></h1>
-        <div id="seasons-list" class="grid grid-cols-1 gap-4"></div>
+    <div id="series-menu" class="overlay p-6 hidden">
+        <button onclick="cerrarSerie()" class="mb-8 text-cyan-400 font-bold uppercase text-[10px] tracking-widest"><i class="fas fa-arrow-left mr-2"></i> Volver</button>
+        <h1 id="serie-title" class="text-3xl font-black mb-2 italic text-white uppercase tracking-tighter"></h1>
+        <p class="text-white/40 text-[9px] mb-8 tracking-[4px]">SELECCIONA TEMPORADA</p>
+        <div id="seasons-list" class="grid grid-cols-1 gap-3"></div>
     </div>
 
-    <div id="episodes-menu" class="overlay p-6">
-        <button onclick="document.getElementById('episodes-menu').style.display='none'" class="mb-8 text-cyan-400 font-bold uppercase text-xs tracking-widest">← Volver a Temporadas</button>
-        <h2 id="season-title" class="text-2xl font-bold mb-6 text-white/80"></h2>
-        <div id="episodes-list" class="space-y-3"></div>
+    <div id="episodes-menu" class="overlay p-6 hidden">
+        <button onclick="document.getElementById('episodes-menu').classList.add('hidden')" class="mb-8 text-cyan-400 font-bold uppercase text-[10px] tracking-widest"><i class="fas fa-arrow-left mr-2"></i> Temporadas</button>
+        <h2 id="season-title" class="text-xl font-bold mb-6 text-white/80"></h2>
+        <div id="episodes-list" class="space-y-2"></div>
     </div>
 
-    <div id="player-view" class="overlay">
-        <div class="p-4 flex justify-between items-center bg-black/95 border-b border-white/10">
-            <button onclick="cerrarPlayer()" class="text-white text-[10px] font-bold">CERRAR ⏻</button>
-            <select id="audio-selector" class="bg-white/5 border border-white/20 text-cyan-400 text-[10px] p-2 rounded-lg outline-none">
-                <option value="es">Español (España)</option>
-                <option value="en">English (Original)</option>
-                <option value="fr">Français (Francia)</option>
-                <option value="lat">Español (Latino)</option>
-                <option value="zh">Mandarin (China)</option>
-                <option value="de">Alman (Almania)</option>
-                <option value="nl">Neerlandes (Belgica)</option>
-                <option value="ko">Coreano (Corea)</option>
-                <option value="hi">Hindi (India)</option>
-                <option value="ar">Arabe (Egipto)</option>
+    <div id="player-view" class="overlay hidden">
+        <div class="p-4 flex justify-between items-center bg-black border-b border-white/10">
+            <button onclick="cerrarPlayer()" class="text-white text-[9px] font-black border border-white/20 px-3 py-1 rounded">CERRAR ⏻</button>
+            <select id="audio-selector" class="bg-white/5 border border-white/10 text-[9px] p-2 rounded text-cyan-400 outline-none">
+                <option value="es">ESPAÑOL (ESPAÑA)</option>
+                <option value="lat">ESPAÑOL (LATINO)</option>
+                <option value="en">ENGLISH (ORIGINAL)</option>
+                <option value="fr">FRANÇAIS</option>
+                <option value="zh">MANDARÍN</option>
+                <option value="de">DEUTSCH</option>
+                <option value="nl">NEERLANDÉS</option>
+                <option value="ko">KOREAN</option>
+                <option value="hi">HINDI</option>
+                <option value="ar">ARABIC</option>
             </select>
         </div>
-        <div id="video-container" class="w-full h-[75vh] bg-black"></div>
+        <div id="video-container" class="w-full h-full bg-black"></div>
     </div>
 
     <script src="script.js"></script>
