@@ -57,39 +57,29 @@ function mostrarSerie(data) {
     `).join('');
 }
 
-async function mostrarCapitulos(id, sNum, sName) {
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${sNum}?api_key=${TMDB_KEY}&language=es-ES`);
-    const data = await res.json();
-    document.getElementById('episodes-menu').style.display = 'block';
-    document.getElementById('season-title').innerText = sName;
-    const list = document.getElementById('episodes-list');
-    list.innerHTML = data.episodes.map(e => `
-        <div class="glass-btn text-xs font-bold cursor-pointer" onclick="reproducir(${id}, 'tv', ${sNum}, ${e.episode_number})">
-            <span class="text-cyan-400 mr-2">${e.episode_number}.</span> ${e.name}
-        </div>
-    `).join('');
+
 function reproducir(id, tipo, s=1, e=1) {
     const holder = document.getElementById('video-container');
-    const audio = document.getElementById('audio-selector').value;
     document.getElementById('player-view').style.display = 'block';
     
-    // Limpieza de seguridad
-    holder.innerHTML = `<div style="color:cyan; text-align:center; padding-top:20%;">DABO CORE: SALTANDO BLOQUEO...</div>`;
+    // 1. Mensaje de bypass
+    holder.innerHTML = `<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#00e5ff;font-family:Orbitron;font-size:10px;text-align:center;">DABO-CORE V2.0<br>SALTANDO PROTOCOLO DE BLOQUEO...</div>`;
 
-    // Servidor Nodo-XYZ (El más resistente actualmente)
+    // 2. Servidor de grado industrial (Sin restricciones de dominio)
     const url = tipo === 'movie' ? 
-        `https://vidsrc.xyz/embed/movie?tmdb=${id}&lang=${audio}` : 
-        `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}&lang=${audio}`;
+        `https://embed.su/embed/movie/${id}` : 
+        `https://embed.su/embed/tv/${id}/${s}/${e}`;
 
+    // 3. Inyección limpia con borrado de rastro
     setTimeout(() => {
         holder.innerHTML = `
             <iframe 
                 src="${url}" 
                 style="width:100%; height:100%; border:none;" 
-                allowfullscreen="true"
+                allowfullscreen 
                 referrerpolicy="no-referrer">
             </iframe>`;
-    }, 500);
+    }, 800);
 }
 
 
