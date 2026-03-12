@@ -91,6 +91,16 @@ function lanzarVideo(id, tipo, s=1, e=1) {
         root.innerHTML = `<iframe src="${url}" class="w-full h-full" allowfullscreen allow="autoplay" referrerpolicy="no-referrer" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe>`;
         revenue += 0.50;
         localStorage.setItem('dabo_revenue', revenue.toFixed(2));
+// Esta configuración permite idiomas, pantalla completa y audio
+root.innerHTML = `
+    <iframe 
+        src="${url}" 
+        class="w-full h-full" 
+        allowfullscreen 
+        allow="autoplay; encrypted-media; clipboard-write" 
+        referrerpolicy="no-referrer"
+        sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation">
+    </iframe>`;
     };
 }
 
