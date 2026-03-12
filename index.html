@@ -79,18 +79,22 @@
         <div id="episodes-list" class="space-y-3"></div>
     </div>
 
-    <div id="player-view" class="fixed inset-0 z-[8000] bg-black hidden flex-col">
-        <div class="p-4 flex justify-between items-center border-b border-white/10">
-            <button onclick="pararReproductor()" class="text-white text-xs font-bold bg-white/10 px-4 py-2 rounded-lg">CERRAR</button>
-            <span class="text-cyan-400 text-[9px] font-black uppercase tracking-widest">Dabo Vision Stream</span>
-        </div>
-        <div class="relative flex-1 flex items-center justify-center">
-            <div id="video-container" class="w-full h-full"></div>
-            <button id="play-trigger" class="absolute z-[9000] bg-cyan-400 text-black w-24 h-24 rounded-full flex items-center justify-center text-3xl shadow-2xl">
-                <i class="fas fa-play ml-1"></i>
-            </button>
+    <div id="player-view" class="fixed inset-0 z-[100] bg-black hidden flex-col">
+    <div class="p-4 flex justify-between items-center border-b border-white/10">
+        <button onclick="cerrarPlayer()" class="text-xs font-bold uppercase tracking-widest text-white/50">← Cerrar</button>
+        <div class="flex gap-2">
+            <button onclick="cargarServidor(1)" class="bg-cyan-400 text-black px-3 py-1 rounded-full text-[10px] font-bold">SERVER LATINO</button>
+            <button onclick="cargarServidor(2)" class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold">SERVER SUB</button>
         </div>
     </div>
+    <div id="video-container" class="flex-1 bg-black relative"></div>
+    <div id="play-trigger" class="absolute inset-0 flex items-center justify-center bg-black/80 z-[110] cursor-pointer">
+        <div class="w-20 h-20 bg-cyan-400 rounded-full flex items-center justify-center text-black text-3xl shadow-[0_0_30px_rgba(0,229,255,0.5)]">
+            <i class="fas fa-play ml-1"></i>
+        </div>
+    </div>
+</div>
+
 
     <script>
         const TMDB_KEY = 'a6178823f5e2f865dfd88e8cade51391';
