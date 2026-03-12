@@ -73,36 +73,35 @@ async function verEpisodios(id, season) {
 }
 
 // 4. REPRODUCTOR MAESTRO
-function lanzarVideo(id, tipo, s=1, e=1) {
-    const layer = document.getElementById('player-layer');
-    const trigger = document.getElementById('play-trigger');
+function lanzarPlayer(id, tipo, s=1, e=1) {
+    const p = document.getElementById('player');
     const root = document.getElementById('video-root');
+    const btn = document.getElementById('play-btn');
     
-    layer.style.display = 'flex';
+    p.classList.remove('hidden');
     root.innerHTML = '';
-    trigger.style.display = 'flex';
+    btn.style.display = 'flex';
 
-    trigger.onclick = () => {
-        trigger.style.display = 'none';
-        const url = tipo === 'movie' ? 
-            `https://vidsrc.me/embed/movie?tmdb=${id}` : 
-            `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+    btn.onclick = () => {
+        btn.style.display = 'none';
         
-        root.innerHTML = `<iframe src="${url}" class="w-full h-full" allowfullscreen allow="autoplay" referrerpolicy="no-referrer" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe>`;
-        revenue += 0.50;
-        localStorage.setItem('dabo_revenue', revenue.toFixed(2));
-// Esta configuración permite idiomas, pantalla completa y audio
-root.innerHTML = `
-    <iframe 
-        src="${url}" 
-        class="w-full h-full" 
-        allowfullscreen 
-        allow="autoplay; encrypted-media; clipboard-write" 
-        referrerpolicy="no-referrer"
-        sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation">
-    </iframe>`;
+        // Usamos vidsrc.xyz que tiene mejor soporte multiaudio
+        const url = tipo === 'movie' ? 
+            `https://vidsrc.xyz/embed/movie?tmdb=${id}` : 
+            `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+        
+        root.innerHTML = `
+            <iframe src="${url}" 
+                style="width:100%; height:100%;" 
+                allowfullscreen="true" 
+                webkitallowfullscreen="true" 
+                mozallowfullscreen="true" 
+                allow="autoplay; encrypted-media" 
+                referrerpolicy="no-referrer">
+            </iframe>`;
     };
 }
+
 
 function cerrarCapa(id) { document.getElementById(id).style.display = 'none'; }
 function cerrarReproductor() { 
