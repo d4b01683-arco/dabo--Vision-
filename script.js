@@ -135,3 +135,7 @@ function mostrarLegal(tipo) {
         `;
     }
 }
+// Servidor con mayor soporte de idiomas (vidsrc.xyz)
+const url = tipo === 'movie' ? 
+    `https://vidsrc.xyz/embed/movie?tmdb=${id}` : 
+    `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
