@@ -139,3 +139,7 @@ function mostrarLegal(tipo) {
 const url = tipo === 'movie' ? 
     `https://vidsrc.xyz/embed/movie?tmdb=${id}` : 
     `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+// Cambia vidsrc.me por vidsrc.xyz para desbloquear más audios
+const url = tipo === 'movie' ? 
+    `https://vidsrc.xyz/embed/movie?tmdb=${id}` : 
+    `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
