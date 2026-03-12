@@ -4,26 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
-    <title>DaBo Vision Global | Estrenos 2026 Online Gratis</title>
-    <meta name="description" content="La plataforma definitiva para ver películas, series y animes en 10 idiomas. Todo el contenido de DaBo Vision en alta definición.">
-    <meta name="keywords" content="ver peliculas gratis, estrenos 2026, series online, dabo vision, anime español">
-    <link rel="canonical" href="https://dabo-vision.net/" />
-
+    <title>DaBo Vision Global | Estrenos 2026 Online</title>
+    <meta name="description" content="La mejor plataforma para ver películas y series online. DaBo Vision Global Pro 2.0.">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4950666349242719" crossorigin="anonymous"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animación obligatoria para el botón de Play en iPhone */
+        #play-trigger { animation: pulseBtn 1.5s infinite; transition: transform 0.3s; }
+        @keyframes pulseBtn {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 229, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+        iframe { border: none; width: 100%; height: 100%; background: #000; }
+    </style>
+
+   <div id="legal-layer" class="fixed inset-0 z-[9999] bg-black hidden overflow-y-auto p-8 pt-24">
+    <div class="max-w-3xl mx-auto">
+        <button onclick="document.getElementById('legal-layer').style.display='none'" class="text-cyan-400 font-bold mb-8 uppercase tracking-widest">← Cerrar Documento</button>
+        
+        <div id="legal-content" class="text-white/70 text-sm leading-relaxed space-y-6">
+            </div>
+    </div>
+</div>
+
+<footer class="p-10 border-t border-white/5 text-center space-y-4">
+    <div class="flex justify-center gap-6">
+        <button onclick="mostrarLegal('privacidad')" class="text-[10px] text-white/40 hover:text-cyan-400 uppercase tracking-widest">Política de Privacidad</button>
+        <button onclick="mostrarLegal('terminos')" class="text-[10px] text-white/40 hover:text-cyan-400 uppercase tracking-widest">Términos de Uso</button>
+    </div>
+    <p class="text-[9px] text-white/20">© 2026 DaBo Vision Global. Todos los derechos reservados.</p>
+</footer>
+
+
 </head>
-<body class="bg-black text-white">
+<body>
 
     <nav class="fixed top-0 w-full z-[5000] p-6 bg-black/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center mb-4">
-            <div class="text-3xl font-black text-cyan-400 tracking-tighter cursor-pointer" id="admin-trigger">DV</div>
-            <button class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fas fa-microphone text-cyan-400"></i></button>
+            <div class="text-3xl font-black text-cyan-400 tracking-tighter cursor-pointer" onclick="window.location.reload()">DV</div>
+            <div class="text-[10px] font-bold bg-white/10 px-2 py-1 rounded">2026 PRO</div>
         </div>
         <div class="relative max-w-2xl mx-auto">
-            <input type="text" id="main-search" class="w-full bg-white/10 border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-400" placeholder="Buscar películas o series...">
+            <input type="text" id="main-search" class="w-full bg-white/10 border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-400 text-white placeholder-white/30" placeholder="Buscar película, serie o anime...">
             <button onclick="ejecutarBusqueda()" class="absolute right-4 top-4 text-cyan-400"><i class="fas fa-search"></i></button>
         </div>
     </nav>
@@ -33,32 +63,135 @@
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
-    <main id="catalog-content" class="pb-20 px-6"></main>
+    <main id="main-view" class="pb-20 px-6">
+        <div id="catalog-container"></div>
+    </main>
 
-    <div id="series-layer" class="fixed inset-0 z-[6000] bg-black hidden overflow-y-auto p-6 pt-24">
-        <button onclick="cerrarCapa('series-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase underline">← Volver al Catálogo</button>
-        <h1 id="serie-title" class="text-4xl font-black mb-8 italic"></h1>
-        <div id="seasons-container" class="grid gap-4"></div>
+    <div id="series-modal" class="fixed inset-0 z-[6000] bg-black hidden overflow-y-auto p-6 pt-24">
+        <button onclick="cerrarModal('series-modal')" class="text-cyan-400 font-bold mb-6 text-xs uppercase tracking-widest underline">← Volver al Catálogo</button>
+        <h1 id="modal-title" class="text-4xl font-black mb-8 italic text-white leading-tight"></h1>
+        <div id="seasons-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <div id="episodes-layer" class="fixed inset-0 z-[7000] bg-black hidden overflow-y-auto p-6 pt-24">
-        <button onclick="cerrarCapa('episodes-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase underline">← Volver a Temporadas</button>
-        <div id="episodes-container" class="space-y-3"></div>
+    <div id="episodes-modal" class="fixed inset-0 z-[7000] bg-black hidden overflow-y-auto p-6 pt-24">
+        <button onclick="cerrarModal('episodes-modal')" class="text-cyan-400 font-bold mb-6 text-xs uppercase tracking-widest underline">← Volver a Temporadas</button>
+        <div id="episodes-list" class="space-y-3"></div>
     </div>
 
-    <div id="player-layer" class="fixed inset-0 z-[8000] bg-black hidden flex-col">
+    <div id="player-view" class="fixed inset-0 z-[8000] bg-black hidden flex-col">
         <div class="p-4 flex justify-between items-center border-b border-white/10">
-            <button onclick="cerrarReproductor()" class="text-white text-xs font-bold uppercase">← Salir</button>
-            <div class="text-[10px] text-cyan-400 font-bold tracking-widest uppercase">DaBo Vision Player</div>
+            <button onclick="pararReproductor()" class="text-white text-xs font-bold bg-white/10 px-4 py-2 rounded-lg">CERRAR</button>
+            <span class="text-cyan-400 text-[9px] font-black uppercase tracking-widest">Dabo Vision Stream</span>
         </div>
-        <div class="relative flex-1 bg-black flex items-center justify-center">
-            <div id="video-root" class="w-full h-full"></div>
-            <button id="play-trigger" class="absolute z-[9000] bg-cyan-400 text-black w-24 h-24 rounded-full flex items-center justify-center text-3xl shadow-[0_0_50px_rgba(0,229,255,0.6)]">
+        <div class="relative flex-1 flex items-center justify-center">
+            <div id="video-container" class="w-full h-full"></div>
+            <button id="play-trigger" class="absolute z-[9000] bg-cyan-400 text-black w-24 h-24 rounded-full flex items-center justify-center text-3xl shadow-2xl">
                 <i class="fas fa-play ml-1"></i>
             </button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const TMDB_KEY = 'a6178823f5e2f865dfd88e8cade51391';
+        const rows = ["Tendencias", "Acción", "Anime", "Terror", "Ciencia Ficción"];
+
+        window.onload = () => cargarInicio();
+
+        // 1. CARGA DE CATÁLOGO INICIAL
+        async function cargarInicio() {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '';
+            for (let genero of rows) {
+                const section = document.createElement('div');
+                section.className = 'mb-10';
+                section.innerHTML = `<h3 class="text-[10px] font-black uppercase text-cyan-400 mb-4 tracking-[4px] italic">${genero}</h3>
+                                     <div class="flex gap-4 overflow-x-auto pb-4 scroll-hide" id="row-${genero}"></div>`;
+                container.appendChild(section);
+                
+                const query = genero === "Tendencias" ? "trending/all/week" : `search/multi?query=${genero}`;
+                const res = await fetch(`https://api.themoviedb.org/3/${query}${query.includes('?') ? '&' : '?'}api_key=${TMDB_KEY}&language=es-ES`);
+                const data = await res.json();
+                
+                document.getElementById(`row-${genero}`).innerHTML = data.results.filter(m => m.poster_path).map(m => `
+                    <div class="min-w-[140px] h-[210px] rounded-xl bg-cover bg-center border border-white/5 shadow-xl active:scale-95 transition-all" 
+                         onclick="identificar(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" 
+                         style="background-image:url('https://image.tmdb.org/t/p/w300${m.poster_path}')"></div>
+                `).join('');
+            }
+        }
+
+        // 2. BUSCADOR INTEGRADO
+        async function ejecutarBusqueda() {
+            const q = document.getElementById('main-search').value;
+            if(q.length < 2) return;
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${q}&language=es-ES`);
+            const data = await res.json();
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = `<button onclick="cargarInicio()" class="mb-8 text-cyan-400 text-xs font-bold underline">← VOLVER AL INICIO</button>
+                                   <div class="grid grid-cols-2 gap-4">
+                                   ${data.results.filter(m=>m.poster_path).map(m => `
+                                       <div class="aspect-[2/3] rounded-xl bg-cover border border-white/10" 
+                                            onclick="identificar(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" 
+                                            style="background-image:url('https://image.tmdb.org/t/p/w300${m.poster_path}')"></div>
+                                   `).join('')}</div>`;
+        }
+        document.getElementById('main-search').onkeyup = (e) => { if(e.key === 'Enter') ejecutarBusqueda(); };
+
+        // 3. RECONOCIMIENTO DE CONTENIDO
+        async function identificar(id, tipo) {
+            if(tipo === 'tv' || tipo === 'serie') {
+                const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=es-ES`);
+                const data = await res.json();
+                document.getElementById('modal-title').innerText = data.name;
+                document.getElementById('seasons-grid').innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `
+                    <div class="bg-white/5 p-5 rounded-xl border border-white/10 flex justify-between items-center active:bg-white/20" onclick="cargarEpisodios(${id}, ${s.season_number})">
+                        <span class="font-bold tracking-tight">${s.name}</span>
+                        <span class="text-[10px] text-cyan-400">${s.episode_count} EPS</span>
+                    </div>
+                `).join('');
+                document.getElementById('series-modal').style.display = 'block';
+            } else {
+                abrirReproductor(id, 'movie');
+            }
+        }
+
+        async function cargarEpisodios(id, season) {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${season}?api_key=${TMDB_KEY}&language=es-ES`);
+            const data = await res.json();
+            document.getElementById('episodes-list').innerHTML = data.episodes.map(e => `
+                <div class="bg-white/5 p-4 rounded-xl text-sm flex justify-between items-center active:bg-cyan-400/10" onclick="abrirReproductor(${id}, 'tv', ${season}, ${e.episode_number})">
+                    <span><b class="text-cyan-400 mr-2">${e.episode_number}.</b> ${e.name}</span>
+                    <i class="fas fa-play-circle text-cyan-400"></i>
+                </div>
+            `).join('');
+            document.getElementById('episodes-modal').style.display = 'block';
+        }
+
+        // 4. REPRODUCTOR ULTRA-COMPATIBLE
+        function abrirReproductor(id, tipo, s=1, e=1) {
+            const view = document.getElementById('player-view');
+            const trigger = document.getElementById('play-trigger');
+            const container = document.getElementById('video-container');
+            
+            view.style.display = 'flex';
+            container.innerHTML = ''; // Limpiar antes de cargar
+            trigger.style.display = 'flex';
+
+            trigger.onclick = () => {
+                trigger.style.display = 'none';
+                const url = tipo === 'movie' ? 
+                    `https://vidsrc.me/embed/movie?tmdb=${id}` : 
+                    `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+                
+                container.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay" referrerpolicy="no-referrer"></iframe>`;
+            };
+        }
+
+        function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+        function pararReproductor() { 
+            document.getElementById('player-view').style.display = 'none'; 
+            document.getElementById('video-container').innerHTML = ''; 
+        }
+    </script>
 </body>
 </html>

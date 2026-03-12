@@ -104,3 +104,25 @@ function cerrarReproductor() {
 document.getElementById('admin-trigger').onclick = () => {
     if(prompt("PIN:") === "110103") alert("Revenue: $" + revenue.toFixed(2));
 };
+function mostrarLegal(tipo) {
+    const layer = document.getElementById('legal-layer');
+    const content = document.getElementById('legal-content');
+    layer.style.display = 'block';
+
+    if (tipo === 'privacidad') {
+        content.innerHTML = `
+            <h2 class="text-2xl font-black text-white italic">POLÍTICA DE PRIVACIDAD</h2>
+            <p>En <b>dabo-vision.net</b>, la privacidad de nuestros usuarios es prioridad. No recolectamos datos personales identificables sin consentimiento.</p>
+            <p><b>Cookies:</b> Utilizamos cookies propias y de terceros (Google AdSense) para mejorar la experiencia y mostrar publicidad relevante.</p>
+            <p><b>Publicidad de Google:</b> Google utiliza la cookie de DART para mostrar anuncios basados en intereses. Puedes desactivarla en la configuración de anuncios de tu cuenta de Google.</p>
+        `;
+    } else {
+        content.innerHTML = `
+            <h2 class="text-2xl font-black text-white italic">TÉRMINOS DE USO</h2>
+            <p>El acceso a <b>DaBo Vision Global</b> implica la aceptación de estos términos.</p>
+            <p><b>Uso del servicio:</b> Esta plataforma es un motor de búsqueda de metadatos que utiliza la API de TMDB. El contenido visual es servido por proveedores externos independientes.</p>
+            <p><b>Responsabilidad:</b> No almacenamos archivos de video en nuestros servidores. El usuario es responsable del uso que haga de la información proporcionada.</p>
+            <p><b>Propiedad Intelectual:</b> Todos los logos y marcas pertenecen a sus respectivos dueños.</p>
+        `;
+    }
+}
