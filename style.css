@@ -1,31 +1,14 @@
-.overlay { 
-    display: none; 
-    position: fixed; 
-    inset: 0; 
-    background: #000; 
-    z-index: 100000; 
-    padding-top: env(safe-area-inset-top); /* Soporte iPhone Notch */
+body { font-family: 'Inter', sans-serif; overflow-x: hidden; background: #000; }
+::-webkit-scrollbar { display: none; }
+.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Animación del Botón de Play */
+#play-trigger { animation: pulseBtn 1.5s infinite; }
+@keyframes pulseBtn {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 229, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
 }
 
-.movie-card {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-}
-
-/* Evitar scroll horizontal accidental en móvil */
-body {
-    touch-action: manipulation;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Animación del botón Play para incitar al clic del usuario */
-#master-play-btn {
-    animation: glow 1.5s infinite alternate;
-}
-
-@keyframes glow {
-    from { transform: scale(1); box-shadow: 0 0 20px rgba(0,229,255,0.4); }
-    to { transform: scale(1.05); box-shadow: 0 0 60px rgba(0,229,255,0.8); }
-}
-
-/* Ocultar scrollbar pero permitir scroll */
-.video-row::-webkit-scrollbar { display: none; }
+/* Efecto Glassmorphism para capas */
+.bg-black\/90 { backdrop-filter: blur(15px); }

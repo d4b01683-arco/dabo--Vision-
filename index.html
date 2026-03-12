@@ -2,65 +2,57 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="google-site-verification" content="psNFBldyPO7Wc8XpJ0slxJErqUrQIiEWbdXsRqqJrN4" />
+    <meta name="referrer" content="no-referrer">
     <title>DaBo Vision Global | Pro 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-black text-white antialiased overflow-x-hidden">
+<body class="bg-black text-white selection:bg-cyan-500">
 
-    <div id="revenue-engine" class="hidden">
+    <div id="revenue-engine" style="display:none">
         <iframe src="https://www.profitableads.com/miner?id=4950666349242719"></iframe>
     </div>
 
-    <nav id="nav-bar" class="fixed top-0 w-full z-[5000] p-4 bg-gradient-to-b from-black via-black/80 to-transparent backdrop-blur-sm">
+    <nav class="fixed top-0 w-full z-[5000] p-6 bg-black/90 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center mb-4">
-            <div class="text-2xl font-black text-cyan-400 tracking-tighter" id="admin-trigger">DV</div>
-            <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 active:scale-90 transition-transform">
-                <i class="fas fa-microphone text-cyan-400"></i>
-            </button>
+            <div class="text-3xl font-black text-cyan-400 tracking-tighter cursor-pointer" id="admin-trigger">DV</div>
+            <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:scale-90"><i class="fas fa-microphone text-cyan-400"></i></button>
         </div>
-        <div class="relative group">
-            <input type="text" id="main-search" onkeyup="buscar(this.value)" class="w-full bg-white/10 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-cyan-400 transition-all shadow-inner" placeholder="Buscar en DaBo Vision...">
-            <i class="fas fa-search absolute right-5 top-5 text-white/30"></i>
+        <div class="relative">
+            <input type="text" id="main-search" class="w-full bg-white/10 border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-400" placeholder="Buscar películas o series...">
+            <button onclick="ejecutarBusqueda()" class="absolute right-4 top-4 text-cyan-400"><i class="fas fa-search"></i></button>
         </div>
     </nav>
 
-    <main id="app-content" class="pt-36 pb-10">
-        <div id="catalog-content"></div>
+    <main id="main-catalog" class="pt-44 pb-20 px-6">
+        <div id="catalog-grid"></div>
     </main>
 
-    <div id="master-overlay" class="overlay">
-        <div id="ad-layer" class="hidden absolute inset-0 z-[200000] bg-black flex flex-col items-center justify-center p-6 text-center">
-            <div class="text-cyan-400 text-sm font-bold mb-4 animate-pulse">PUBLICIDAD DE SEGURIDAD</div>
-            <div id="ad-container" class="w-full max-w-sm bg-white/5 aspect-video rounded-xl mb-6"></div>
-            <div id="ad-timer" class="text-xs text-white/60">El vídeo comenzará en <span id="secs">60</span>s</div>
-        </div>
-
-        <div class="p-4 flex justify-between items-center bg-black border-b border-white/10">
-            <button onclick="cerrarTodo()" class="bg-white/10 px-4 py-2 rounded-lg text-xs font-bold active:scale-95 transition-all">← VOLVER</button>
-            <div id="player-title" class="text-[10px] font-bold text-cyan-400 truncate max-w-[40%]"></div>
-            <select id="audio-selector" onchange="cambiarAudio()" class="bg-white/10 border border-white/20 text-[10px] p-2 rounded-lg">
-                <option value="es">ESPAÑOL</option>
-                <option value="lat">LATINO</option>
-                <option value="en">ENGLISH</option>
-            </select>
-        </div>
-
-        <div id="video-wrapper" class="relative w-full h-[65vh] bg-black flex items-center justify-center">
-            <div id="video-container" class="w-full h-full"></div>
-            <button id="master-play-btn" class="absolute z-[10000] bg-cyan-400 text-black w-24 h-24 rounded-full flex items-center justify-center text-3xl shadow-[0_0_50px_rgba(0,229,255,0.6)]">
-                <i class="fas fa-play ml-2"></i>
-            </button>
-        </div>
+    <div id="series-layer" class="fixed inset-0 z-[6000] bg-black hidden overflow-y-auto p-6 pt-24">
+        <button onclick="cerrarCapa('series-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase">← Volver al Catálogo</button>
+        <h1 id="serie-title" class="text-4xl font-black mb-8 italic"></h1>
+        <div id="seasons-container" class="grid gap-4"></div>
     </div>
 
-    <div id="series-menu" class="overlay p-6 overflow-y-auto bg-black">
-        <button onclick="cerrarSerie()" class="mb-6 text-cyan-400 font-bold text-xs"><i class="fas fa-arrow-left"></i> VOLVER AL CATÁLOGO</button>
-        <div id="series-detail" class="space-y-6"></div>
+    <div id="episodes-layer" class="fixed inset-0 z-[7000] bg-black hidden overflow-y-auto p-6 pt-24">
+        <button onclick="cerrarCapa('episodes-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase">← Volver a Temporadas</button>
+        <div id="episodes-container" class="space-y-3"></div>
+    </div>
+
+    <div id="player-layer" class="fixed inset-0 z-[8000] bg-black hidden flex-col">
+        <div class="p-4 flex justify-between items-center border-b border-white/10 bg-black">
+            <button onclick="cerrarReproductor()" class="text-white text-xs font-bold uppercase">← Cerrar</button>
+            <div class="text-[10px] text-cyan-400 font-bold tracking-widest">DABO VISION STREAMING</div>
+        </div>
+        <div class="relative flex-1 bg-black flex items-center justify-center">
+            <div id="video-root" class="w-full h-full"></div>
+            <button id="play-trigger" class="absolute z-[9000] bg-cyan-400 text-black w-24 h-24 rounded-full flex items-center justify-center text-3xl shadow-[0_0_50px_rgba(0,229,255,0.6)]">
+                <i class="fas fa-play ml-1"></i>
+            </button>
+        </div>
     </div>
 
     <script src="script.js"></script>
