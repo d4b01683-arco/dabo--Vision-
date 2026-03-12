@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="google-site-verification" content="psNFBldyPO7Wc8XpJ0slxJErqUrQIiEWbdXsRqqJrN4" />
-    <meta name="referrer" content="no-referrer">
-    <title>DaBo Vision Global | Pro 2026</title>
+    
+    <title>DaBo Vision Global | Estrenos 2026 Online Gratis</title>
+    <meta name="description" content="La plataforma definitiva para ver películas, series y animes en 10 idiomas. Todo el contenido de DaBo Vision en alta definición.">
+    <meta name="keywords" content="ver peliculas gratis, estrenos 2026, series online, dabo vision, anime español">
+    <link rel="canonical" href="https://dabo-vision.net/" />
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4950666349242719" crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-black text-white selection:bg-cyan-500">
+<body class="bg-black text-white">
 
-    <div id="revenue-engine" style="display:none">
-        <iframe src="https://www.profitableads.com/miner?id=4950666349242719"></iframe>
-    </div>
-
-    <nav class="fixed top-0 w-full z-[5000] p-6 bg-black/90 backdrop-blur-md border-b border-white/5">
+    <nav class="fixed top-0 w-full z-[5000] p-6 bg-black/95 backdrop-blur-md border-b border-white/5">
         <div class="flex justify-between items-center mb-4">
             <div class="text-3xl font-black text-cyan-400 tracking-tighter cursor-pointer" id="admin-trigger">DV</div>
-            <button onclick="activarVoz()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:scale-90"><i class="fas fa-microphone text-cyan-400"></i></button>
+            <button class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fas fa-microphone text-cyan-400"></i></button>
         </div>
-        <div class="relative">
+        <div class="relative max-w-2xl mx-auto">
             <input type="text" id="main-search" class="w-full bg-white/10 border border-white/10 p-4 rounded-xl outline-none focus:border-cyan-400" placeholder="Buscar películas o series...">
             <button onclick="ejecutarBusqueda()" class="absolute right-4 top-4 text-cyan-400"><i class="fas fa-search"></i></button>
         </div>
     </nav>
 
-    <main id="main-catalog" class="pt-44 pb-20 px-6">
-        <div id="catalog-grid"></div>
-    </main>
+    <div class="pt-44 flex justify-center px-4">
+        <ins class="adsbygoogle" style="display:block; width:100%; max-width:728px;" data-ad-client="ca-pub-4950666349242719" data-ad-slot="auto" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <main id="catalog-content" class="pb-20 px-6"></main>
 
     <div id="series-layer" class="fixed inset-0 z-[6000] bg-black hidden overflow-y-auto p-6 pt-24">
-        <button onclick="cerrarCapa('series-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase">← Volver al Catálogo</button>
+        <button onclick="cerrarCapa('series-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase underline">← Volver al Catálogo</button>
         <h1 id="serie-title" class="text-4xl font-black mb-8 italic"></h1>
         <div id="seasons-container" class="grid gap-4"></div>
     </div>
 
     <div id="episodes-layer" class="fixed inset-0 z-[7000] bg-black hidden overflow-y-auto p-6 pt-24">
-        <button onclick="cerrarCapa('episodes-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase">← Volver a Temporadas</button>
+        <button onclick="cerrarCapa('episodes-layer')" class="text-cyan-400 font-bold mb-6 text-xs uppercase underline">← Volver a Temporadas</button>
         <div id="episodes-container" class="space-y-3"></div>
     </div>
 
     <div id="player-layer" class="fixed inset-0 z-[8000] bg-black hidden flex-col">
-        <div class="p-4 flex justify-between items-center border-b border-white/10 bg-black">
-            <button onclick="cerrarReproductor()" class="text-white text-xs font-bold uppercase">← Cerrar</button>
-            <div class="text-[10px] text-cyan-400 font-bold tracking-widest">DABO VISION STREAMING</div>
+        <div class="p-4 flex justify-between items-center border-b border-white/10">
+            <button onclick="cerrarReproductor()" class="text-white text-xs font-bold uppercase">← Salir</button>
+            <div class="text-[10px] text-cyan-400 font-bold tracking-widest uppercase">DaBo Vision Player</div>
         </div>
         <div class="relative flex-1 bg-black flex items-center justify-center">
             <div id="video-root" class="w-full h-full"></div>
