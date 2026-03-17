@@ -1,10 +1,64 @@
+
 const TMDB_KEY = 'a6178823f5e2f865dfd88e8cade51391';
 const contentArea = document.getElementById('catalog-results');
 
-window.onload = () => {
-    cargarSeccion("Recientemente Añadidos", "movie/now_playing");
-    cargarSeccion("Tendencias", "trending/all/day");
+// Diccionario de IDs de géneros de TMDB
+const GENEROS = {
+    "acción": 28, "comedia": 35, "terror": 27, "romance": 10749,
+    "ciencia y ficción": 878, "fantasía": 14, "historia": 36,
+    "infantil": 10751, "sobrenatural": 9648, "aventura": 12
 };
+
+window.onload = () => {
+    // 1. Secciones Principales
+    cargarSeccion("Estrenos Nuevos", "movie/now_playing");
+    cargarSeccion("Tendencias", "trending/all/day");
+    
+    // 2. Por Tipo
+    cargarSeccion("Películas", "discover/movie");
+    cargarSeccion("Series de TV", "discover/tv");
+    cargarSeccion("Animes", "discover/tv", "&with_keywords=210024&with_original_language=ja");
+
+    // 3. Por Géneros (Usando el diccionario)
+    cargarSeccion("Acción", "discover/movie", `&with_genres=${GENEROS["acción"]}`);
+    cargarSeccion("Comedia", "discover/movie", `&with_genres=${GENEROS["comedia"]}`);
+    cargarSeccion("Terror", "discover/movie", `&with_genres=${GENEROS["terror"]}`);
+    cargarSeccion("Romance y Amor", "discover/movie", `&with_genres=${GENEROS["romance"]}`);
+    cargarSeccion("Ciencia Ficción", "discover/movie", `&with_genres=${GENEROS["ciencia y ficción"]}`);
+    cargarSeccion("Fantasía", "discover/movie", `&with_genres=${GENEROS["fantasía"]}`);
+    cargarSeccion("Historia", "discover/movie", `&with_genres=${GENEROS["historia"]}`);
+    cargarSeccion("Infantil", "discover/movie", `&with_genres=${GENEROS["infantil"]}`);
+};
+
+async function cargarSeccion(titulo, path, extraParams = "") {
+    try {
+        const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${TMDB_KEY}&language=es-ES${extraParams}`);
+        const data = await res.json();
+        
+        if (!data.results || data.results.length === 0) return;
+
+        let html = `
+            <section class="mb-10">
+                <h2 class="text-[10px] font-black uppercase text-cyan-400 mb-6 tracking-[5px] italic">${titulo}</h2>
+                <div class="flex gap-4 overflow-x-auto pb-4 scroll-hide">`;
+        
+        data.results.forEach(m => {
+            if(m.poster_path) {
+                const tipo = m.media_type || (m.title ? 'movie' : 'tv');
+                html += `
+                    <div class="min-w-[160px] h-[240px] rounded-3xl bg-cover bg-center border border-white/10 active:scale-95 transition-all cursor-pointer shadow-2xl" 
+                         onclick="verificarContenido(${m.id}, '${tipo}')" 
+                         style="background-image:url('https://image.tmdb.org/t/p/w400${m.poster_path}')">
+                    </div>`;
+            }
+        });
+        
+        html += `</div></section>`;
+        contentArea.innerHTML += html;
+    } catch (error) {
+        console.error("Error cargando sección:", titulo, error);
+    }
+}
 
 async function cargarSeccion(titulo, path) {
     const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${TMDB_KEY}&language=es-ES`);
