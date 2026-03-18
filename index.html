@@ -1,120 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5172813511662387"
-     crossorigin="anonymous"></script>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>DaBo Vision Global</title>
+    <title>DV GLOBAL - Multi-API System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .scroll-hide::-webkit-scrollbar { display: none; }
-        .movie-card:active { transform: scale(0.95); }
+        .movie-card { transition: all 0.3s ease; flex-shrink: 0; cursor: pointer; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); }
+        .movie-card:hover { transform: scale(1.05); border-color: #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+        iframe { background: #000; }
     </style>
 </head>
-<body><amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-5172813511662387">
-</amp-auto-ads>
-    <div id="privacy-modal" class="fixed inset-0 z-[300] bg-black/95 hidden overflow-y-auto p-6 backdrop-blur-md">
-    <div class="max-w-3xl mx-auto bg-zinc-900 border border-white/10 rounded-3xl p-8 my-10 shadow-2xl">
-        <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-            <h2 class="text-xl font-black italic text-cyan-400 uppercase tracking-tighter">Política de Privacidad</h2>
-            <button onclick="togglePrivacy(false)" class="text-white/40 hover:text-white text-xs uppercase font-bold">Cerrar [X]</button>
-        </div>
-        
-        <div class="space-y-6 text-sm text-gray-400 leading-relaxed font-light">
-            <p>En <span class="text-white font-bold">dabo-vision.net</span>, la privacidad de nuestros visitantes es de extrema importancia. Este documento detalla cómo recopilamos y utilizamos la información.</p>
+<body>
 
-            <div>
-                <h3 class="text-white font-bold uppercase mb-2">1. Google AdSense y Cookies</h3>
-                <p>Google, como proveedor externo, utiliza cookies para publicar anuncios en nuestro sitio. El uso de la cookie de publicidad permite a Google y a sus socios mostrar anuncios basados en las visitas de los usuarios a nuestro sitio o a otros sitios web en Internet.</p>
-            </div>
-
-            <div>
-                <h3 class="text-white font-bold uppercase mb-2">2. Archivos de Registro</h3>
-                <p>Al igual que muchos otros sitios web, dabo-vision.net utiliza archivos de registro. Estos archivos simplemente registran a los visitantes del sitio; normalmente un procedimiento estándar para las empresas de alojamiento y parte de la analítica de los servicios de alojamiento.</p>
-            </div>
-
-            <div>
-                <h3 class="text-white font-bold uppercase mb-2">3. Consentimiento</h3>
-                <p>Al utilizar nuestro sitio web, usted acepta nuestra Política de Privacidad y está de acuerdo con sus términos. Cumplimos con las normativas GDPR y CCPA.</p>
-            </div>
-            
-            <p class="pt-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-white/20">Última actualización: 17 de Marzo, 2026</p>
-        </div>
-    </div>
-</div>
-
-<footer class="py-10 text-center border-t border-white/5">
-    <button onclick="togglePrivacy(true)" class="text-[10px] text-white/30 hover:text-cyan-400 uppercase tracking-[3px] transition-all">
-        Política de Privacidad & Cookies
-    </button>
-</footer>
-
-
-    <nav class="fixed top-0 w-full z-[100] bg-black/90 backdrop-blur-md border-b border-white/5 p-5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <nav class="fixed top-0 w-full z-[100] bg-black/90 backdrop-blur-md border-b border-white/5 p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
             <h1 class="text-2xl font-black text-cyan-400 italic tracking-tighter cursor-pointer" onclick="location.reload()">DV GLOBAL</h1>
-            <div class="relative w-2/3 md:w-1/2">
-                <input type="text" id="main-search" placeholder="Buscar..." 
+            <div class="relative w-full md:w-1/2">
+                <input type="text" id="main-search" placeholder="Buscar en 4 bases de datos..." 
                     class="w-full bg-white/10 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 ring-cyan-500 text-sm">
             </div>
         </div>
     </nav>
 
-    <main id="app-content" class="pt-32 px-4 pb-20 max-w-7xl mx-auto space-y-10">
+    <main id="app-content" class="pt-32 px-4 pb-20 max-w-7xl mx-auto space-y-12">
         <div id="catalog-results"></div>
     </main>
 
     <div id="player-view" class="fixed inset-0 z-[200] bg-black hidden flex-col">
         <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/10">
-            <button onclick="cerrarPlayer()" class="text-[10px] font-black text-white/40 uppercase tracking-widest">← VOLVER</button>
-            <span id="player-info" class="text-cyan-400 font-bold text-[10px] italic">REPRODUCIENDO</span>
+            <button onclick="cerrarPlayer()" class="text-[10px] font-black text-white/40 hover:text-white uppercase tracking-widest">← VOLVER</button>
+            <div class="flex gap-2" id="server-selector"></div>
         </div>
-        <div class="flex-1 bg-black relative">
-            <div id="video-root" class="w-full h-full"></div>
-        </div>
+        <div id="video-root" class="flex-1"></div>
     </div>
 
-    <div id="series-modal" class="fixed inset-0 z-[150] bg-black/95 hidden overflow-y-auto p-6">
-        <div class="max-w-4xl mx-auto pt-10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="modal-title" class="text-2xl font-black italic uppercase text-cyan-400"></h2>
-                <button onclick="cerrarModalSeries()" class="text-white text-xl">×</button>
-            </div>
-            <div id="seasons-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            <div id="episodes-container" class="mt-8 hidden">
-                <h3 class="text-white font-bold mb-4 text-xs uppercase tracking-widest">Capítulos:</h3>
-                <div id="episodes-list" class="space-y-2"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="privacy-modal" class="fixed inset-0 z-[300] bg-black/95 hidden overflow-y-auto p-6 backdrop-blur-md">
-        <div class="max-w-3xl mx-auto bg-zinc-900 border border-white/10 rounded-3xl p-8 my-10 shadow-2xl">
-            <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <h2 class="text-xl font-black italic text-cyan-400 uppercase tracking-tighter">Política de Privacidad</h2>
-                <button onclick="togglePrivacy(false)" class="text-white/40 hover:text-white text-xs uppercase font-bold">Cerrar [X]</button>
-            </div>
-            <div class="space-y-6 text-sm text-gray-400 leading-relaxed font-light">
-                <p>En <span class="text-white font-bold">dabo-vision.net</span>, la privacidad de nuestros visitantes es de extrema importancia...</p>
+    <div id="series-modal" class="fixed inset-0 z-[150] bg-black/95 hidden overflow-y-auto p-6 backdrop-blur-lg">
+        <div class="max-w-4xl mx-auto pt-16">
+            <div class="flex justify-between items-start mb-8">
                 <div>
-                    <h3 class="text-white font-bold uppercase mb-2">1. Google AdSense y Cookies</h3>
-                    <p>Google, como proveedor externo, utiliza cookies para publicar anuncios en nuestro sitio...</p>
+                    <h2 id="modal-title" class="text-3xl font-black italic uppercase text-cyan-400"></h2>
+                    <p id="modal-desc" class="text-gray-400 text-sm mt-2 max-w-2xl"></p>
                 </div>
-                <p class="pt-4 border-t border-white/5 text-[10px] uppercase tracking-widest text-white/20">Última actualización: 17 de Marzo, 2026</p>
+                <button onclick="cerrarModalSeries()" class="text-white bg-white/10 p-2 rounded-full">×</button>
+            </div>
+            
+            <div id="seasons-container" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10"></div>
+            
+            <div id="episodes-container" class="hidden animate-fade-in">
+                <h3 class="text-cyan-400 font-bold mb-4 text-xs uppercase tracking-[3px]">Episodios disponibles:</h3>
+                <div id="episodes-list" class="grid grid-cols-1 gap-2"></div>
             </div>
         </div>
     </div>
 
-    <footer class="py-10 text-center border-t border-white/5">
-        <button onclick="togglePrivacy(true)" class="text-[10px] text-white/30 hover:text-cyan-400 uppercase tracking-[3px] transition-all">
-            Política de Privacidad & Cookies
-        </button>
+    <footer class="py-10 text-center border-t border-white/5 bg-zinc-950/50">
+        <button onclick="togglePrivacy(true)" class="text-[10px] text-white/30 hover:text-cyan-400 uppercase tracking-[3px]">Política de Privacidad & Cookies</button>
     </footer>
 
     <script src="script.js"></script>
