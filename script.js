@@ -1,119 +1,150 @@
+/**
+ * DV GLOBAL - NÚCLEO DEL SISTEMA 2026
+ * Integración: TMDB, Trakt, TVMaze, OMDb
+ */
+
 const KEYS = {
     tmdb: 'a6178823f5e2f865dfd88e8cade51391',
-    trakt: 'e27de53be7675061564fde80a3b1e04443b22831627664ce1c8119476d959ca0'
+    trakt: 'e27de53be7675061564fde80a3b1e04443b22831627664ce1c8119476d959ca0',
+    omdb: 'bb228c8d'
 };
 
-const catalog = document.getElementById('catalog-results');
+const appContainer = document.getElementById('catalog-results');
 
-window.onload = () => {
-    inicializarApp();
-};
-
-async function inicializarApp() {
-    // 1. Tendencias Mundiales (Trakt.tv)
-    await cargarSeccionTrakt("Tendencias Mundiales", "movies/trending");
-    // 2. Estrenos (TMDB)
+window.onload = async () => {
+    // Iniciar con las 4 fuentes de datos
+    await cargarSeccionTrakt("Tendencias Globales (Trakt)", "movies/trending");
     await cargarSeccionTMDB("Estrenos en Cine", "movie/now_playing");
-    // 3. Anime (TVMaze)
-    await cargarSeccionTVMaze("Lo último en Anime", "anime");
-    // 4. Géneros (TMDB)
-    await cargarSeccionTMDB("Terror & Suspenso", "discover/movie", "&with_genres=27");
+    await cargarSeccionTVMaze("Animes y Series (TVMaze)", "anime");
+    await cargarSeccionTMDB("Acción", "discover/movie", "&with_genres=28");
+    await cargarSeccionTMDB("Terror", "discover/movie", "&with_genres=27");
     await cargarSeccionTMDB("Ciencia Ficción", "discover/movie", "&with_genres=878");
-}
+};
 
-// --- MOTOR DE BÚSQUEDA ---
+// --- MOTOR DE BÚSQUEDA MULTI-API ---
 document.getElementById('main-search').addEventListener('keypress', async (e) => {
     if (e.key === 'Enter') {
-        const q = e.target.value;
-        if (!q) return;
-        catalog.innerHTML = `<h2 class="text-cyan-400 font-black italic">BUSCANDO: ${q}...</h2>`;
-        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEYS.tmdb}&query=${q}&language=es-ES`);
-        const data = await res.json();
+        const query = e.target.value;
+        if (!query) return;
         
-        catalog.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-5 gap-6">`;
-        data.results.forEach(m => {
-            if (m.poster_path) {
-                catalog.innerHTML += renderCard(m.id, m.title || m.name, m.poster_path, m.media_type, false);
-            }
-        });
-        catalog.innerHTML += `</div>`;
+        appContainer.innerHTML = `<div class="py-10 text-center text-cyan-400 animate-pulse font-black uppercase tracking-widest">Buscando en base de datos...</div>`;
+        
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEYS.tmdb}&query=${query}&language=es-ES`);
+            const data = await res.json();
+            
+            appContainer.innerHTML = `<h2 class="text-white font-black mb-6 uppercase italic">Resultados para: ${query}</h2>
+                                      <div class="grid grid-cols-2 md:grid-cols-5 gap-6">`;
+            
+            data.results.forEach(m => {
+                if (m.poster_path) {
+                    const tipo = m.media_type || (m.title ? 'movie' : 'tv');
+                    appContainer.querySelector('div').innerHTML += renderCard(m.id, m.title || m.name, m.poster_path, tipo, false);
+                }
+            });
+            appContainer.innerHTML += `</div>`;
+        } catch (err) {
+            appContainer.innerHTML = `<p class="text-red-500">Error en la búsqueda.</p>`;
+        }
     }
 });
 
-// --- CARGADORES DE API ---
+// --- CARGADORES DE SECCIONES ---
+
 async function cargarSeccionTMDB(titulo, path, params = "") {
     const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEYS.tmdb}&language=es-ES${params}`);
     const data = await res.json();
-    renderFila(titulo, data.results.map(m => ({ id: m.id, title: m.title || m.name, img: m.poster_path, tipo: m.media_type || (path.includes('movie') ? 'movie' : 'tv') })));
+    renderFila(titulo, data.results.map(m => ({
+        id: m.id,
+        title: m.title || m.name,
+        img: m.poster_path,
+        tipo: m.media_type || (path.includes('movie') ? 'movie' : 'tv')
+    })));
 }
 
 async function cargarSeccionTrakt(titulo, endpoint) {
     try {
-        const res = await fetch(`https://api.trakt.tv/${endpoint}`, { headers: { 'trakt-api-version': '2', 'trakt-api-key': KEYS.trakt } });
+        const res = await fetch(`https://api.trakt.tv/${endpoint}`, {
+            headers: { 'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': KEYS.trakt }
+        });
         const data = await res.json();
-        const items = await Promise.all(data.slice(0, 10).map(async (entry) => {
-            const id = entry.movie ? entry.movie.ids.tmdb : entry.show.ids.tmdb;
-            return { id, title: "", img: null, tipo: entry.movie ? 'movie' : 'tv', needsImg: true };
+        const items = data.slice(0, 10).map(entry => ({
+            id: entry.movie ? entry.movie.ids.tmdb : entry.show.ids.tmdb,
+            title: entry.movie ? entry.movie.title : entry.show.title,
+            tipo: entry.movie ? 'movie' : 'tv',
+            needsImg: true
         }));
         renderFila(titulo, items);
-    } catch (e) { console.error("Trakt Error"); }
+    } catch (e) { console.error("Error Trakt API"); }
 }
 
 async function cargarSeccionTVMaze(titulo, query) {
     const res = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
     const data = await res.json();
-    renderFila(titulo, data.map(i => ({ id: i.show.externals.thetvdb || i.show.id, title: i.show.name, img: i.show.image ? i.show.image.medium : null, tipo: 'tv', isFullUrl: true })));
+    renderFila(titulo, data.map(i => ({
+        id: i.show.externals.thetvdb || i.show.id,
+        title: i.show.name,
+        img: i.show.image ? i.show.image.medium : null,
+        tipo: 'tv',
+        isFullUrl: true
+    })));
 }
 
-// --- RENDERIZADO ---
+// --- RENDERIZADO DE INTERFAZ ---
+
 function renderFila(titulo, items) {
-    const container = document.createElement('div');
-    container.className = "mb-10";
-    container.innerHTML = `<h2 class="text-[10px] font-black uppercase text-cyan-400 mb-4 tracking-[5px] italic">${titulo}</h2>
-                           <div class="flex gap-4 overflow-x-auto pb-4 scroll-hide"></div>`;
+    const section = document.createElement('div');
+    section.className = "mb-12";
+    section.innerHTML = `<h2 class="text-[10px] font-black uppercase text-cyan-400 mb-6 tracking-[5px] italic">${titulo}</h2>
+                         <div class="flex gap-5 overflow-x-auto pb-6 scroll-hide"></div>`;
     
-    const row = container.querySelector('div');
+    const row = section.querySelector('div');
     items.forEach(async item => {
         let poster = item.isFullUrl ? item.img : `https://image.tmdb.org/t/p/w400${item.img}`;
+        
         if (item.needsImg) {
             const r = await fetch(`https://api.themoviedb.org/3/${item.tipo}/${item.id}?api_key=${KEYS.tmdb}`);
             const d = await r.json();
             poster = `https://image.tmdb.org/t/p/w400${d.poster_path}`;
         }
-        if (poster) row.innerHTML += renderCard(item.id, item.title, poster, item.tipo, true);
+        
+        if (poster && !poster.includes('null')) {
+            row.innerHTML += renderCard(item.id, item.title, poster, item.tipo, true);
+        }
     });
-    catalog.appendChild(container);
+    appContainer.appendChild(section);
 }
 
 function renderCard(id, title, img, tipo, isImgReady) {
     const poster = isImgReady ? img : `https://image.tmdb.org/t/p/w400${img}`;
-    return `<div class="movie-card min-w-[150px] md:min-w-[180px] h-[230px] md:h-[270px] bg-cover bg-center" 
-                 onclick="identificarContenido(${id}, '${tipo}')" 
+    return `<div class="movie-card min-w-[160px] md:min-w-[190px] h-[240px] md:h-[280px] bg-cover bg-center shadow-2xl" 
+                 onclick="gestionarSeleccion(${id}, '${tipo}')" 
                  style="background-image:url('${poster}')">
             </div>`;
 }
 
-// --- LÓGICA DE RECONOCIMIENTO (SERIE VS PELÍCULA) ---
-function identificarContenido(id, tipo) {
+// --- LÓGICA DE REPRODUCCIÓN Y SERIES ---
+
+function gestionarSeleccion(id, tipo) {
     if (tipo === 'tv' || tipo === 'show') {
-        abrirEstructuraSerie(id);
+        abrirModalSerie(id);
     } else {
         lanzarReproductor(id, 'movie');
     }
 }
 
-async function abrirEstructuraSerie(id) {
+async function abrirModalSerie(id) {
     const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${KEYS.tmdb}&language=es-ES`);
     const data = await res.json();
     
     document.getElementById('modal-title').innerText = data.name;
-    document.getElementById('modal-desc').innerText = data.overview || "Sin descripción disponible.";
+    document.getElementById('modal-desc').innerText = data.overview || "Sin descripción.";
     
     const seasonsDiv = document.getElementById('seasons-container');
     seasonsDiv.innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `
-        <div class="bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-cyan-400/20 cursor-pointer text-center" 
+        <div class="bg-zinc-900 p-4 rounded-2xl border border-white/5 hover:border-cyan-500 cursor-pointer text-center transition-all" 
              onclick="cargarEpisodios(${id}, ${s.season_number})">
-            <span class="text-xs font-black italic uppercase">${s.name}</span>
+            <span class="text-[10px] font-black uppercase italic">${s.name}</span>
         </div>
     `).join('');
     
@@ -127,31 +158,59 @@ async function cargarEpisodios(id, sNum) {
     
     const list = document.getElementById('episodes-list');
     list.innerHTML = data.episodes.map(e => `
-        <div class="bg-white/5 p-4 rounded-lg flex justify-between items-center hover:bg-white/10 cursor-pointer group" 
+        <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center hover:bg-white/10 cursor-pointer group" 
              onclick="lanzarReproductor(${id}, 'tv', ${sNum}, ${e.episode_number})">
-            <span class="text-xs font-medium italic"><b class="text-cyan-400 mr-2">${e.episode_number}.</b> ${e.name}</span>
-            <i class="fas fa-play-circle text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            <span class="text-xs italic"><b class="text-cyan-400 mr-2">${e.episode_number}.</b> ${e.name}</span>
+            <i class="fas fa-play text-[10px] text-cyan-400 opacity-0 group-hover:opacity-100 transition-all"></i>
         </div>
     `).join('');
     
     document.getElementById('episodes-container').classList.remove('hidden');
-    list.scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- REPRODUCTOR FINAL ---
+// --- REPRODUCTOR FINAL (SOLUCIÓN SANDBOX E IDIOMAS) ---
+
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const root = document.getElementById('video-root');
+    const serverSelector = document.getElementById('server-selector');
     document.getElementById('player-view').classList.remove('hidden');
-    
-    const url = tipo === 'movie' 
-        ? `https://vidsrc.xyz/embed/movie?tmdb=${id}` 
-        : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
-    
+
+    const servidores = [
+        { nombre: "MULTI-AUDIO", url: tipo === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}` },
+        { nombre: "LATINO/ES", url: tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` },
+        { nombre: "GLOBAL", url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` }
+    ];
+
+    serverSelector.innerHTML = servidores.map(serv => `
+        <button onclick="cambiarServidor('${serv.url}')" class="bg-white/5 hover:bg-cyan-500 text-[8px] font-bold px-3 py-1 rounded-full uppercase transition-all">
+            ${serv.nombre}
+        </button>
+    `).join('');
+
+    cambiarServidor(servidores[0].url);
+}
+
+function cambiarServidor(url) {
+    const root = document.getElementById('video-root');
+    // NO usamos el atributo 'sandbox' para evitar el error de bloqueo de scripts
     root.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;" 
-                        allowfullscreen allow="autoplay; encrypted-media" referrerpolicy="no-referrer"></iframe>`;
+                        allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
 }
 
 // --- UTILIDADES ---
-function cerrarPlayer() { document.getElementById('player-view').classList.add('hidden'); document.getElementById('video-root').innerHTML = ''; }
-function cerrarModalSeries() { document.getElementById('series-modal').classList.add('hidden'); }
-function togglePrivacy(show) { /* Tu lógica de privacidad */ }
+
+function cerrarPlayer() { 
+    document.getElementById('player-view').classList.add('hidden'); 
+    document.getElementById('video-root').innerHTML = ''; 
+}
+
+function cerrarModalSeries() { 
+    document.getElementById('series-modal').classList.add('hidden'); 
+}
+
+function togglePrivacy(show) {
+    const modal = document.getElementById('privacy-modal');
+    if (modal) {
+        show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
+    }
+}
