@@ -1,7 +1,7 @@
 /**
- * DV GLOBAL - CORE ENGINE v6.0
- * Multi-API: TMDB, Trakt, TVMaze
- * Audio: Latino, Castellano, English, Français
+ * DV GLOBAL - PRO ENGINE v7.0
+ * Audio Selector: Latino, Castellano, English, Français
+ * No-Sandbox / No-Block System
  */
 
 const KEYS = {
@@ -13,18 +13,17 @@ const appContainer = document.getElementById('catalog-results');
 
 window.onload = async () => {
     await cargarSeccionTrakt("Tendencias Mundiales", "movies/trending");
-    await cargarSeccionTMDB("Estrenos", "movie/now_playing");
-    await cargarSeccionTVMaze("Animes & Series", "anime");
+    await cargarSeccionTMDB("Estrenos Recientes", "movie/now_playing");
+    await cargarSeccionTVMaze("Series y Animación", "anime");
     await cargarSeccionTMDB("Acción", "discover/movie", "&with_genres=28");
-    await cargarSeccionTMDB("Terror", "discover/movie", "&with_genres=27");
 };
 
-// --- MOTOR DE BÚSQUEDA ---
+// --- BUSCADOR ---
 document.getElementById('main-search').addEventListener('keypress', async (e) => {
     if (e.key === 'Enter') {
         const query = e.target.value;
         if (!query) return;
-        appContainer.innerHTML = `<div class="py-20 text-center text-cyan-400 font-black animate-pulse">BUSCANDO...</div>`;
+        appContainer.innerHTML = `<div class="py-20 text-center text-cyan-400 font-black animate-pulse">CONECTANDO A BASE DE DATOS...</div>`;
         const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEYS.tmdb}&query=${query}&language=es-ES`);
         const data = await res.json();
         appContainer.innerHTML = `<h2 class="text-white font-black mb-10 uppercase italic">Resultados: ${query}</h2><div class="grid grid-cols-2 md:grid-cols-5 gap-6" id="search-grid"></div>`;
@@ -37,7 +36,7 @@ document.getElementById('main-search').addEventListener('keypress', async (e) =>
     }
 });
 
-// --- CARGADORES ---
+// --- CARGADORES DE API ---
 async function cargarSeccionTMDB(titulo, path, params = "") {
     const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEYS.tmdb}&language=es-ES${params}`);
     const data = await res.json();
@@ -77,7 +76,7 @@ function renderFila(titulo, items) {
 
 function renderCard(id, title, img, tipo, isImgReady) {
     const poster = isImgReady ? img : `https://image.tmdb.org/t/p/w400${img}`;
-    return `<div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl relative group overflow-hidden" onclick="gestionarSeleccion(${id}, '${tipo}')" style="background-image:url('${poster}')"></div>`;
+    return `<div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl" onclick="gestionarSeleccion(${id}, '${tipo}')" style="background-image:url('${poster}')"></div>`;
 }
 
 // --- SERIES ---
@@ -93,7 +92,6 @@ async function abrirModalSerie(id) {
     document.getElementById('modal-desc').innerText = data.overview;
     document.getElementById('seasons-container').innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `<div class="bg-zinc-900 p-4 rounded-2xl border border-white/5 hover:border-cyan-500 cursor-pointer text-center" onclick="cargarEpisodios(${id}, ${s.season_number})"><span class="text-[10px] font-black uppercase italic">${s.name}</span></div>`).join('');
     document.getElementById('series-modal').classList.remove('hidden');
-    document.getElementById('episodes-container').classList.add('hidden');
 }
 
 async function cargarEpisodios(id, sNum) {
@@ -103,26 +101,26 @@ async function cargarEpisodios(id, sNum) {
     document.getElementById('episodes-container').classList.remove('hidden');
 }
 
-// --- REPRODUCTOR (AUDIO MULTI-IDIOMA) ---
+// --- REPRODUCTOR (IDIOMAS FORZADOS) ---
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const root = document.getElementById('video-root');
     const selector = document.getElementById('server-selector');
     document.getElementById('player-view').classList.remove('hidden');
 
-    // Servidores con selectores de audio integrados (Latino, Castellano, Inglés, Francés)
+    // Servidores que incluyen menú de Audio: Latino, Castellano, English, Français
     const servidores = [
-        { nombre: "MULTI-AUDIO 1", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
-        { nombre: "MULTI-AUDIO 2", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
-        { nombre: "ESPAÑOL/LATINO", url: tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` }
+        { nombre: "Servidor 1 (Recomendado)", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+        { nombre: "Servidor 2 (Multi-idioma)", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
+        { nombre: "Servidor 3 (Latino/ES)", url: tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` }
     ];
 
-    selector.innerHTML = servidores.map(serv => `<button onclick="cambiarServidor('${serv.url}')" class="bg-white/5 border border-white/10 hover:bg-cyan-500 text-[8px] font-black px-4 py-2 rounded-full uppercase transition-all tracking-tighter">${serv.nombre}</button>`).join('');
+    selector.innerHTML = servidores.map(serv => `<button onclick="cambiarServidor('${serv.url}')" class="bg-white/5 border border-white/10 hover:bg-cyan-500 text-[8px] font-black px-4 py-2 rounded-full uppercase transition-all">${serv.nombre}</button>`).join('');
     cambiarServidor(servidores[0].url);
 }
 
 function cambiarServidor(url) {
     const root = document.getElementById('video-root');
-    // Sin Sandbox para que el reproductor pueda mostrar sus menús de idioma
+    // SIN SANDBOX para permitir que el reproductor acceda a los archivos de audio
     root.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
 }
 
