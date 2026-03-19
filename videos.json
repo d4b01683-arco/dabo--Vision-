@@ -1,0 +1,26 @@
+{
+  "manual_database": [
+    {
+      "tmdb_id": "550",
+      "tipo": "movie",
+      "title": "Fight Club",
+      "links": {
+        "latino": "https://tu-servidor.com/latino.mp4",
+        "castellano": "https://tu-servidor.com/castellano.mp4",
+        "english": "https://tu-servidor.com/english.mp4",
+        "french": "https://tu-servidor.com/french.mp4"
+      }
+    },
+    {
+      "tmdb_id": "1396",
+      "tipo": "tv",
+      "title": "Breaking Bad",
+      "temporada": 1,
+      "episodio": 1,
+      "links": {
+        "latino": "https://tu-servidor.com/bb-s1e1-lat.mp4",
+        "english": "https://tu-servidor.com/bb-s1e1-en.mp4"
+      }
+    }
+  ]
+}
