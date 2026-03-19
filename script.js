@@ -1,7 +1,7 @@
 /**
- * DV GLOBAL - CORE ENGINE v5.0
+ * DV GLOBAL - CORE ENGINE v6.0
  * Multi-API: TMDB, Trakt, TVMaze
- * Fix: Forced Multi-Audio & No-Sandbox
+ * Audio: Latino, Castellano, English, Français
  */
 
 const KEYS = {
@@ -15,8 +15,8 @@ window.onload = async () => {
     await cargarSeccionTrakt("Tendencias Mundiales", "movies/trending");
     await cargarSeccionTMDB("Estrenos", "movie/now_playing");
     await cargarSeccionTVMaze("Animes & Series", "anime");
+    await cargarSeccionTMDB("Acción", "discover/movie", "&with_genres=28");
     await cargarSeccionTMDB("Terror", "discover/movie", "&with_genres=27");
-    await cargarSeccionTMDB("Ciencia Ficción", "discover/movie", "&with_genres=878");
 };
 
 // --- MOTOR DE BÚSQUEDA ---
@@ -103,16 +103,17 @@ async function cargarEpisodios(id, sNum) {
     document.getElementById('episodes-container').classList.remove('hidden');
 }
 
-// --- REPRODUCTOR (FIX AUDIO & SANDBOX) ---
+// --- REPRODUCTOR (AUDIO MULTI-IDIOMA) ---
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const root = document.getElementById('video-root');
     const selector = document.getElementById('server-selector');
     document.getElementById('player-view').classList.remove('hidden');
 
+    // Servidores con selectores de audio integrados (Latino, Castellano, Inglés, Francés)
     const servidores = [
-        { nombre: "OPCIÓN 1 (MULTI-AUDIO)", url: tipo === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}` },
-        { nombre: "OPCIÓN 2 (LATINO/ES)", url: tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` },
-        { nombre: "OPCIÓN 3 (CLÁSICOS)", url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` }
+        { nombre: "MULTI-AUDIO 1", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
+        { nombre: "MULTI-AUDIO 2", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+        { nombre: "ESPAÑOL/LATINO", url: tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` }
     ];
 
     selector.innerHTML = servidores.map(serv => `<button onclick="cambiarServidor('${serv.url}')" class="bg-white/5 border border-white/10 hover:bg-cyan-500 text-[8px] font-black px-4 py-2 rounded-full uppercase transition-all tracking-tighter">${serv.nombre}</button>`).join('');
@@ -121,7 +122,7 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
 
 function cambiarServidor(url) {
     const root = document.getElementById('video-root');
-    // ELIMINADO TOTALMENTE EL ATRIBUTO SANDBOX PARA EVITAR EL BLOQUEO
+    // Sin Sandbox para que el reproductor pueda mostrar sus menús de idioma
     root.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
 }
 
