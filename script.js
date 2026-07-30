@@ -129,6 +129,7 @@ async function cargarEpisodios(id, sNum) {
 }
 
 //// 6. REPRODUCTOR HÍBRIDO CON MÚLTIPLES IDIOMAS Y SERVIDORES AMPLIADOS
+// 6. REPRODUCTOR HÍBRIDO CON PROVEEDORES REALES SEPARADOS POR IDIOMA
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const selector = document.getElementById('server-selector');
     const playerView = document.getElementById('player-view');
@@ -136,49 +137,49 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
     playerView.classList.add('active');
     document.getElementById('series-modal').classList.add('hidden'); 
 
-    // Lista ampliada de servidores con diferentes opciones de idioma y proveedores reales
+    // Usamos diferentes plataformas de embed para asegurar que el contenido cambie de idioma/servidor
     const servidoresAvanzados = [
         {
             pais: "🇲🇽",
-            nombre: "LATINO (Streamtape)",
-            desc: "Audio Latino - Rápido en Móvil",
-            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?ds_lang=es` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?ds_lang=es`
+            nombre: "LATINO (VidSrc CC)",
+            desc: "Audio Latino principal",
+            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇲🇽",
-            nombre: "LATINO (Filemoon)",
-            desc: "Audio Latino - Alta Definición",
-            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}?language=es` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}?language=es`
+            nombre: "LATINO (MultiCloud)",
+            desc: "Audio Latino - Alternativo",
+            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
         },
         {
             pais: "🇪🇸",
-            nombre: "CASTELLANO",
-            desc: "España - Servidor Estable",
-            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}&lang=es-ES` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}&lang=es-ES`
+            nombre: "CASTELLANO (España)",
+            desc: "Audio de España (Castellano)",
+            url: tipo === 'movie' ? `https://vidsrc.su/embed/movie/${id}` : `https://vidsrc.su/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇺🇸",
-            nombre: "ENGLISH (Original)",
-            desc: "Audio Inglés / Sin subtítulos",
-            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}?language=en` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}?language=en`
+            nombre: "ENGLISH (HD)",
+            desc: "Audio Inglés Original",
+            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇯🇵",
-            nombre: "JAPONÉS (Anime/Sub)",
-            desc: "Audio Original con Subtítulos",
+            nombre: "JAPONÉS (Subtitulado)",
+            desc: "Audio Japonés / Anime",
             url: tipo === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇫🇷",
             nombre: "FRANÇAIS",
-            desc: "Audio Français - HD",
-            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?ds_lang=fr` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?ds_lang=fr`
+            desc: "Audio en Francés",
+            url: tipo === 'movie' ? `https://vidsrc.pm/embed/movie/${id}` : `https://vidsrc.pm/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇩🇪",
             nombre: "DEUTSCH",
-            desc: "Audio Deutsch - Standard",
-            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?ds_lang=de` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?ds_lang=de`
+            desc: "Audio en Alemán",
+            url: tipo === 'movie' ? `https://vidsrc.net/embed/movie/${id}` : `https://vidsrc.net/embed/tv/${id}/${s}/${e}`
         }
     ];
 
@@ -192,7 +193,7 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
         </button>
     `).join('');
 
-    // Cargar por defecto el primer servidor configurado
+    // Cargar por defecto el primer servidor
     cambiarServidor(servidoresAvanzados[0].url);
 }
 
