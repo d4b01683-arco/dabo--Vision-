@@ -120,10 +120,14 @@ async function cargarEpisodios(id, sNum) {
 }
 
 // 6. REPRODUCTOR HÍBRIDO CON SEGUIDOR DE IDIOMAS Y SERVIDORES TIPO STREAMTAPE/FILEMOON
+// 6. REPRODUCTOR HÍBRIDO CON SEGUIDOR DE IDIOMAS Y SERVIDORES
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const selector = document.getElementById('server-selector');
-    document.getElementById('player-view').classList.remove('hidden');
-    document.getElementById('series-modal').classList.add('hidden'); // Ocultar modal si estaba abierto
+    const playerView = document.getElementById('player-view');
+    
+    // Activar vista con clase controlada
+    playerView.classList.add('active');
+    document.getElementById('series-modal').classList.add('hidden'); 
 
     const servidoresAvanzados = [
         {
@@ -152,8 +156,8 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
         }
     ];
 
-    selector.innerHTML = servidoresAvanzados.map(serv => `
-        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-2 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-2.5 rounded-xl text-left transition-all group">
+    selector.innerHTML = servidoresAvanzados.map((serv, index) => `
+        <button onclick="cambiarServidor('${serv.url}', this)" class="server-btn flex items-center gap-2 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-2.5 rounded-xl text-left transition-all group ${index === 0 ? 'border-cyan-500 bg-zinc-800' : ''}">
             <span class="text-xl">${serv.pais}</span>
             <div class="overflow-hidden">
                 <div class="text-[10px] font-black text-cyan-400 group-hover:text-white uppercase truncate">${serv.nombre}</div>
@@ -162,26 +166,27 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
         </button>
     `).join('');
 
-    // Iniciar por defecto con el primer servidor
+    // Cargar por defecto el primer servidor
     cambiarServidor(servidoresAvanzados[0].url);
 }
 
-function cambiarServidor(url) {
+function cambiarServidor(url, btnElement) {
     const root = document.getElementById('video-root');
     root.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
+
+    // Resaltar visualmente el botón seleccionado si se pasa como parámetro
+    if (btnElement) {
+        document.querySelectorAll('.server-btn').forEach(b => {
+            b.classList.remove('border-cyan-500', 'bg-zinc-800');
+        });
+        btnElement.classList.add('border-cyan-500', 'bg-zinc-800');
+    }
 }
 
-// FUNCIÓN DE CIERRE DE REPRODUCTOR CORREGIDA Y LIMPIA
 function cerrarPlayer() { 
     const playerView = document.getElementById('player-view');
     const root = document.getElementById('video-root');
     
-    playerView.classList.remove('flex');
-    playerView.classList.add('hidden'); 
-    root.innerHTML = ''; // Destruye el iframe para detener la reproducción de audio/video
+    playerView.classList.remove('active');
+    root.innerHTML = ''; // Destruye el iframe y detiene el video al salir
 }
-
-function cerrarModalSeries() { 
-    document.getElementById('series-modal').classList.add('hidden'); 
-}
-
