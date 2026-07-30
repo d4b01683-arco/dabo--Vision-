@@ -3,26 +3,26 @@ body {
     color: #fff; 
     font-family: 'Inter', sans-serif; 
     overflow-x: hidden; 
+    -webkit-tap-highlight-color: transparent; /* Elimina el brillo molesto al tocar en iOS */
 }
 
 .scroll-hide::-webkit-scrollbar { display: none; }
 .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 .movie-card { 
-    transition: all 0.3s ease; 
+    transition: transform 0.2s ease; 
     flex-shrink: 0; 
     cursor: pointer; 
     border-radius: 1rem; 
     border: 1px solid rgba(255,255,255,0.1); 
+    pointer-events: auto !important; /* Fuerza la interacción táctil */
+    touch-action: manipulation;
 }
 
-.movie-card:hover { 
-    transform: scale(1.05); 
-    border-color: #00e5ff; 
-    box-shadow: 0 0 20px rgba(0,229,255,0.2); 
+.movie-card:active { 
+    transform: scale(0.95); 
 }
 
-/* Forzar que el visor del reproductor ocupe el 100% */
 #player-view {
     display: none;
 }
@@ -32,7 +32,7 @@ body {
 
 #video-root {
     width: 100%;
-    height: calc(100vh - 120px); /* Resta espacio de la barra superior */
+    height: calc(100vh - 120px);
     background: #000;
 }
 
