@@ -114,42 +114,51 @@ async function cargarEpisodios(id, sNum) {
 }
 
 // 6. REPRODUCTOR HÍBRIDO (EL CORAZÓN)
+// 6. REPRODUCTOR HÍBRIDO AVANZADO (ESTILO MULTI-SERVIDOR)
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const root = document.getElementById('video-root');
     const selector = document.getElementById('server-selector');
     document.getElementById('player-view').classList.remove('hidden');
 
-    const videoPropio = DB_PROPIA.find(item => item.tmdb_id == id && item.tipo == tipo && (tipo === 'movie' || (item.temporada == s && item.episodio == e)));
-
-    let botonesPropio = "";
-    if (videoPropio) {
-        Object.keys(videoPropio.links).forEach(idioma => {
-            const icon = { latino: "🇲🇽", castellano: "🇪🇸", english: "🇺🇸", french: "🇫🇷" };
-            botonesPropio += `<button onclick="cargarVideoDirecto('${videoPropio.links[idioma]}')" class="bg-cyan-600 hover:bg-white hover:text-black text-[8px] font-black px-4 py-2 rounded-full uppercase transition-all">${icon[idioma] || "🌐"} ${idioma}</button>`;
-        });
-    }
-
-    const servidores = [
-        { nombre: "AUTO 1 (IDIOMAS)", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
-        { nombre: "AUTO 2 (ESTABLE)", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
-        { nombre: "CLÁSICOS", url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` }
+    // Puedes definir aquí tus servidores con banderas, nombres y subtítulos de rendimiento
+    const servidoresAvanzados = [
+        {
+            pais: "🇯🇵",
+            nombre: "JAPÓN (SUB)",
+            desc: "Audio Original - Alta Velocidad",
+            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
+        },
+        {
+            pais: "🇲🇽",
+            nombre: "STREAMTAPE",
+            desc: "Audio Latino - Poca Publicidad en Móvil",
+            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`
+        },
+        {
+            pais: "🇲🇽",
+            nombre: "FILEMOON",
+            desc: "Audio Latino - HD / Múltiples opciones",
+            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
+        },
+        {
+            pais: "🇪🇸",
+            nombre: "UQLOAD / DOOD",
+            desc: "Castellano - Servidor Estable",
+            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
+        }
     ];
 
-    selector.innerHTML = botonesPropio + servidores.map(serv => `<button onclick="cambiarServidor('${serv.url}')" class="bg-white/5 border border-white/10 hover:bg-cyan-500 text-[8px] font-black px-4 py-2 rounded-full uppercase">${serv.nombre}</button>`).join('');
+    // Renderizar los botones con el diseño de lista o tarjetas flotantes
+    selector.innerHTML = servidoresAvanzados.map(serv => `
+        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-3 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-3 rounded-xl text-left transition-all group">
+            <span class="text-2xl">${serv.pais}</span>
+            <div>
+                <div class="text-xs font-black text-cyan-400 group-hover:text-white uppercase">${serv.nombre}</div>
+                <div class="text-[9px] text-zinc-400">${serv.desc}</div>
+            </div>
+        </button>
+    `).join('');
 
-    if (videoPropio) cargarVideoDirecto(videoPropio.links[Object.keys(videoPropio.links)[0]]);
-    else cambiarServidor(servidores[0].url);
+    // Iniciar por defecto con el primer servidor
+    cambiarServidor(servidoresAvanzados[0].url);
 }
-
-function cargarVideoDirecto(url) {
-    const root = document.getElementById('video-root');
-    root.innerHTML = `<video controls autoplay class="w-full h-full bg-black"><source src="${url}" type="video/mp4">Tu navegador no soporta el video directo.</video>`;
-}
-
-function cambiarServidor(url) {
-    const root = document.getElementById('video-root');
-    root.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
-}
-
-function cerrarPlayer() { document.getElementById('player-view').classList.add('hidden'); document.getElementById('video-root').innerHTML = ''; }
-function cerrarModalSeries() { document.getElementById('series-modal').classList.add('hidden'); }
