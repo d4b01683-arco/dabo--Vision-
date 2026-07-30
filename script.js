@@ -93,8 +93,17 @@ function renderFila(titulo, items) {
 
 function renderCard(id, title, img, tipo, isImgReady) {
     const poster = isImgReady ? img : `https://image.tmdb.org/t/p/w400${img}`;
-    return `<div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl relative group overflow-hidden" onclick="gestionarSeleccion(${id}, '${tipo}')" style="background-image:url('${poster}')"></div>`;
+    // Usamos ontouchend y onclick para garantizar compatibilidad total en móviles
+    return `
+        <div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl relative group overflow-hidden" 
+             onclick="gestionarSeleccion(${id}, '${tipo}')" 
+             style="background-image:url('${poster}')">
+             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                 <span class="text-xs font-bold text-white truncate">${title || ''}</span>
+             </div>
+        </div>`;
 }
+
 
 // 5. GESTIÓN DE SELECCIÓN (SERIE O PELÍCULA)
 function gestionarSeleccion(id, tipo) {
