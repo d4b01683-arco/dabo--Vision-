@@ -1,12 +1,5 @@
 /**
- * DV GLOBAL - ULTIMATE HYBRID ENGINE v9.0
- * Database: videos.json + TMDB + Trakt + TVMaze
- */
-
-
-/**
- * DV GLOBAL - ULTIMATE HYBRID ENGINE v9.0
- * Database: videos.json + TMDB + Trakt + TVMaze
+ * DV GLOBAL - ULTIMATE HYBRID ENGINE v10.0 (MULTI-AUDIO FORCED)
  */
 
 const KEYS = {
@@ -17,7 +10,6 @@ const KEYS = {
 let DB_PROPIA = [];
 const appContainer = document.getElementById('catalog-results');
 
-// 1. CARGAR TODO AL INICIAR
 window.onload = async () => {
     await cargarBaseDatos();
     await cargarSeccionTrakt("Tendencias Globales", "movies/trending");
@@ -34,7 +26,6 @@ async function cargarBaseDatos() {
     } catch (e) { console.warn("Iniciando sin videos.json local."); }
 }
 
-// 2. BUSCADOR INTELIGENTE
 document.getElementById('main-search').addEventListener('keypress', async (e) => {
     if (e.key === 'Enter') {
         const query = e.target.value;
@@ -52,7 +43,6 @@ document.getElementById('main-search').addEventListener('keypress', async (e) =>
     }
 });
 
-// 3. CARGADORES DE API (TMDB, TRAKT, TVMAZE)
 async function cargarSeccionTMDB(titulo, path, params = "") {
     const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEYS.tmdb}&language=es-ES${params}`);
     const data = await res.json();
@@ -73,7 +63,6 @@ async function cargarSeccionTVMaze(titulo, query) {
     renderFila(titulo, data.map(i => ({ id: i.show.externals.thetvdb || i.show.id, title: i.show.name, img: i.show.image ? i.show.image.medium : null, tipo: 'tv', isFullUrl: true })));
 }
 
-// 4. RENDERIZADO DE INTERFAZ
 function renderFila(titulo, items) {
     const section = document.createElement('div');
     section.className = "mb-14";
@@ -93,7 +82,6 @@ function renderFila(titulo, items) {
 
 function renderCard(id, title, img, tipo, isImgReady) {
     const poster = isImgReady ? img : `https://image.tmdb.org/t/p/w400${img}`;
-    // Usamos ontouchend y onclick para garantizar compatibilidad total en móviles
     return `
         <div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl relative group overflow-hidden" 
              onclick="gestionarSeleccion(${id}, '${tipo}')" 
@@ -104,8 +92,6 @@ function renderCard(id, title, img, tipo, isImgReady) {
         </div>`;
 }
 
-
-// 5. GESTIÓN DE SELECCIÓN (SERIE O PELÍCULA)
 function gestionarSeleccion(id, tipo) {
     if (tipo === 'tv' || tipo === 'show') abrirModalSerie(id);
     else lanzarReproductor(id, 'movie');
@@ -128,8 +114,7 @@ async function cargarEpisodios(id, sNum) {
     document.getElementById('episodes-container').classList.remove('hidden');
 }
 
-//// 6. REPRODUCTOR HÍBRIDO CON MÚLTIPLES IDIOMAS Y SERVIDORES AMPLIADOS
-// 6. REPRODUCTOR HÍBRIDO CON PROVEEDORES REALES SEPARADOS POR IDIOMA
+// 6. MOTOR REPRODUCTOR EXTREMO CON ENRUTAMIENTO FORZADO DE IDIOMA NATIVO
 function lanzarReproductor(id, tipo, s=1, e=1) {
     const selector = document.getElementById('server-selector');
     const playerView = document.getElementById('player-view');
@@ -137,49 +122,49 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
     playerView.classList.add('active');
     document.getElementById('series-modal').classList.add('hidden'); 
 
-    // Usamos diferentes plataformas de embed para asegurar que el contenido cambie de idioma/servidor
+    // URLs directas con nodos de indexación independientes por idioma real
     const servidoresAvanzados = [
         {
             pais: "🇲🇽",
-            nombre: "LATINO (VidSrc CC)",
-            desc: "Audio Latino principal",
-            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`
+            nombre: "LATINO (Opción A)",
+            desc: "Forzado Español Latino",
+            url: tipo === 'movie' ? `https://embed.warezcdn.link/movie/${id}` : `https://embed.warezcdn.link/serie/${id}/${s}/${e}`
         },
         {
             pais: "🇲🇽",
-            nombre: "LATINO (MultiCloud)",
-            desc: "Audio Latino - Alternativo",
-            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
+            nombre: "LATINO (Opción B)",
+            desc: "Multi-Audio Latino HD",
+            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_play=1&locale=la` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_play=1&locale=la`
         },
         {
             pais: "🇪🇸",
             nombre: "CASTELLANO (España)",
-            desc: "Audio de España (Castellano)",
-            url: tipo === 'movie' ? `https://vidsrc.su/embed/movie/${id}` : `https://vidsrc.su/embed/tv/${id}/${s}/${e}`
+            desc: "Servidor Exclusivo España",
+            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}&ds_lang=es` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}&ds_lang=es`
         },
         {
             pais: "🇺🇸",
-            nombre: "ENGLISH (HD)",
-            desc: "Audio Inglés Original",
-            url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
+            nombre: "ENGLISH (Original)",
+            desc: "Audio Nativo Inglés",
+            url: tipo === 'movie' ? `https://vidsrc.net/embed/movie/${id}` : `https://vidsrc.net/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇯🇵",
             nombre: "JAPONÉS (Subtitulado)",
-            desc: "Audio Japonés / Anime",
+            desc: "Audio Original Japonés",
             url: tipo === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇫🇷",
             nombre: "FRANÇAIS",
-            desc: "Audio en Francés",
-            url: tipo === 'movie' ? `https://vidsrc.pm/embed/movie/${id}` : `https://vidsrc.pm/embed/tv/${id}/${s}/${e}`
+            desc: "Audio Français",
+            url: tipo === 'movie' ? `https://vidsrc.pm/embed/movie/${id}?lang=fr` : `https://vidsrc.pm/embed/tv/${id}/${s}/${e}?lang=fr`
         },
         {
             pais: "🇩🇪",
             nombre: "DEUTSCH",
-            desc: "Audio en Alemán",
-            url: tipo === 'movie' ? `https://vidsrc.net/embed/movie/${id}` : `https://vidsrc.net/embed/tv/${id}/${s}/${e}`
+            desc: "Audio Deutsch",
+            url: tipo === 'movie' ? `https://vidsrc.xyz/embed/movie/${id}?lang=de` : `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}?lang=de`
         }
     ];
 
@@ -193,7 +178,6 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
         </button>
     `).join('');
 
-    // Cargar por defecto el primer servidor
     cambiarServidor(servidoresAvanzados[0].url);
 }
 
@@ -207,4 +191,16 @@ function cambiarServidor(url, btnElement) {
         });
         btnElement.classList.add('border-cyan-500', 'bg-zinc-800');
     }
+}
+
+function cerrarPlayer() { 
+    const playerView = document.getElementById('player-view');
+    const root = document.getElementById('video-root');
+    
+    playerView.classList.remove('active');
+    root.innerHTML = ''; 
+}
+
+function cerrarModalSeries() { 
+    document.getElementById('series-modal').classList.add('hidden'); 
 }
