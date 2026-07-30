@@ -3,6 +3,12 @@
  * Database: videos.json + TMDB + Trakt + TVMaze
  */
 
+
+/**
+ * DV GLOBAL - ULTIMATE HYBRID ENGINE v9.0
+ * Database: videos.json + TMDB + Trakt + TVMaze
+ */
+
 const KEYS = {
     tmdb: 'a6178823f5e2f865dfd88e8cade51391',
     trakt: 'e27de53be7675061564fde80a3b1e04443b22831627664ce1c8119476d959ca0'
@@ -113,48 +119,45 @@ async function cargarEpisodios(id, sNum) {
     document.getElementById('episodes-container').classList.remove('hidden');
 }
 
-// 6. REPRODUCTOR HÍBRIDO (EL CORAZÓN)
-// 6. REPRODUCTOR HÍBRIDO AVANZADO (ESTILO MULTI-SERVIDOR)
+// 6. REPRODUCTOR HÍBRIDO CON SEGUIDOR DE IDIOMAS Y SERVIDORES TIPO STREAMTAPE/FILEMOON
 function lanzarReproductor(id, tipo, s=1, e=1) {
-    const root = document.getElementById('video-root');
     const selector = document.getElementById('server-selector');
     document.getElementById('player-view').classList.remove('hidden');
+    document.getElementById('series-modal').classList.add('hidden'); // Ocultar modal si estaba abierto
 
-    // Puedes definir aquí tus servidores con banderas, nombres y subtítulos de rendimiento
     const servidoresAvanzados = [
         {
             pais: "🇯🇵",
             nombre: "JAPÓN (SUB)",
-            desc: "Audio Original - Alta Velocidad",
+            desc: "Audio Original - HD",
             url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇲🇽",
             nombre: "STREAMTAPE",
-            desc: "Audio Latino - Poca Publicidad en Móvil",
+            desc: "Audio Latino - Poca publicidad",
             url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`
         },
         {
             pais: "🇲🇽",
             nombre: "FILEMOON",
-            desc: "Audio Latino - HD / Múltiples opciones",
+            desc: "Audio Latino - HD Estable",
             url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
         },
         {
             pais: "🇪🇸",
             nombre: "UQLOAD / DOOD",
-            desc: "Castellano - Servidor Estable",
+            desc: "Castellano - Rápido",
             url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`
         }
     ];
 
-    // Renderizar los botones con el diseño de lista o tarjetas flotantes
     selector.innerHTML = servidoresAvanzados.map(serv => `
-        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-3 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-3 rounded-xl text-left transition-all group">
-            <span class="text-2xl">${serv.pais}</span>
-            <div>
-                <div class="text-xs font-black text-cyan-400 group-hover:text-white uppercase">${serv.nombre}</div>
-                <div class="text-[9px] text-zinc-400">${serv.desc}</div>
+        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-2 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-2.5 rounded-xl text-left transition-all group">
+            <span class="text-xl">${serv.pais}</span>
+            <div class="overflow-hidden">
+                <div class="text-[10px] font-black text-cyan-400 group-hover:text-white uppercase truncate">${serv.nombre}</div>
+                <div class="text-[8px] text-zinc-400 truncate">${serv.desc}</div>
             </div>
         </button>
     `).join('');
@@ -162,3 +165,23 @@ function lanzarReproductor(id, tipo, s=1, e=1) {
     // Iniciar por defecto con el primer servidor
     cambiarServidor(servidoresAvanzados[0].url);
 }
+
+function cambiarServidor(url) {
+    const root = document.getElementById('video-root');
+    root.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
+}
+
+// FUNCIÓN DE CIERRE DE REPRODUCTOR CORREGIDA Y LIMPIA
+function cerrarPlayer() { 
+    const playerView = document.getElementById('player-view');
+    const root = document.getElementById('video-root');
+    
+    playerView.classList.remove('flex');
+    playerView.classList.add('hidden'); 
+    root.innerHTML = ''; // Destruye el iframe para detener la reproducción de audio/video
+}
+
+function cerrarModalSeries() { 
+    document.getElementById('series-modal').classList.add('hidden'); 
+}
+
