@@ -1,5 +1,6 @@
 /**
- * DV GLOBAL - ULTIMATE HYBRID ENGINE v10.0 (MULTI-AUDIO FORCED)
+ * DV GLOBAL - MULTI-LANGUAGE SUPREME ENGINE v21.0
+ * Con soporte completo para Español, Inglés, Francés, Portugués y Alemán.
  */
 
 const KEYS = {
@@ -7,200 +8,619 @@ const KEYS = {
     trakt: 'e27de53be7675061564fde80a3b1e04443b22831627664ce1c8119476d959ca0'
 };
 
-let DB_PROPIA = [];
 const appContainer = document.getElementById('catalog-results');
+let pageToken = 1;
+let currentMode = 'home';
+let perfilActual = null;
+let idiomaActual = localStorage.getItem('dv_idioma') || 'es';
 
-window.onload = async () => {
-    await cargarBaseDatos();
-    await cargarSeccionTrakt("Tendencias Globales", "movies/trending");
-    await cargarSeccionTMDB("Estrenos en Cine", "movie/now_playing");
-    await cargarSeccionTVMaze("Series & Anime", "anime");
-    await cargarSeccionTMDB("Terror", "discover/movie", "&with_genres=27");
+// DICCIONARIO DE TRADUCCIONES GLOBAL
+const TRADUCCIONES = {
+    es: {
+        who: "¿Quién está viendo hoy?",
+        addProfile: "Añadir Perfil",
+        history: "Historial",
+        mylist: "Mi Lista",
+        searchPlaceholder: "Buscar título...",
+        all: "Todo",
+        action: "Acción",
+        comedy: "Comedia",
+        horror: "Terror",
+        scifi: "Ciencia Ficción",
+        animation: "Animación",
+        loadingMore: "Cargando más contenido infinito...",
+        back: "← Volver",
+        cineMode: "Modo Cine",
+        lightsOn: "Luces Encendidas",
+        close: "✕ Cerrar",
+        episodes: "Episodios disponibles:",
+        playMovie: "▶ Reproducir Película Ahora",
+        play: "Ver",
+        searching: "Buscando...",
+        historyTitle: "Historial / Continuar Viendo",
+        favTitle: "Mi Lista de Favoritos",
+        noHistory: "No tienes historial reciente en este perfil.",
+        noFavs: "No tienes favoritos guardados en este perfil.",
+        trending: "Tendencias Globales",
+        nowPlaying: "Estrenos en Cartelera",
+        popularTv: "Series Populares",
+        moreContent: "Más Contenido"
+    },
+    en: {
+        who: "Who's watching today?",
+        addProfile: "Add Profile",
+        history: "History",
+        mylist: "My List",
+        searchPlaceholder: "Search title...",
+        all: "All",
+        action: "Action",
+        comedy: "Comedy",
+        horror: "Horror",
+        scifi: "Sci-Fi",
+        animation: "Animation",
+        loadingMore: "Loading more infinite content...",
+        back: "← Back",
+        cineMode: "Cinema Mode",
+        lightsOn: "Lights On",
+        close: "✕ Close",
+        episodes: "Available episodes:",
+        playMovie: "▶ Play Movie Now",
+        play: "Watch",
+        searching: "Searching...",
+        historyTitle: "History / Continue Watching",
+        favTitle: "My Favorites List",
+        noHistory: "No recent history in this profile.",
+        noFavs: "No favorites saved in this profile.",
+        trending: "Global Trends",
+        nowPlaying: "Now Playing in Theaters",
+        popularTv: "Popular TV Shows",
+        moreContent: "More Content"
+    },
+    fr: {
+        who: "Qui regarde aujourd'hui ?",
+        addProfile: "Ajouter un profil",
+        history: "Historique",
+        mylist: "Ma Liste",
+        searchPlaceholder: "Rechercher un titre...",
+        all: "Tout",
+        action: "Action",
+        comedy: "Comédie",
+        horror: "Horreur",
+        scifi: "Sci-Fi",
+        animation: "Animation",
+        loadingMore: "Chargement de plus de contenu...",
+        back: "← Retour",
+        cineMode: "Mode Cinéma",
+        lightsOn: "Lumières allumées",
+        close: "✕ Fermer",
+        episodes: "Épisodes disponibles :",
+        playMovie: "▶ Lire le film maintenant",
+        play: "Regarder",
+        searching: "Recherche...",
+        historyTitle: "Historique / Continuer",
+        favTitle: "Mes Favoris",
+        noHistory: "Aucun historique récent dans ce profil.",
+        noFavs: "Aucun favori enregistré dans ce profil.",
+        trending: "Tendances Mondiales",
+        nowPlaying: "Au Cinéma",
+        popularTv: "Séries Populaires",
+        moreContent: "Plus de Contenu"
+    },
+    pt: {
+        who: "Quem está assistindo hoje?",
+        addProfile: "Adicionar Perfil",
+        history: "Histórico",
+        mylist: "Minha Lista",
+        searchPlaceholder: "Pesquisar título...",
+        all: "Tudo",
+        action: "Ação",
+        comedy: "Comédia",
+        horror: "Terror",
+        scifi: "Ficção Científica",
+        animation: "Animação",
+        loadingMore: "Carregando mais conteúdo infinito...",
+        back: "← Voltar",
+        cineMode: "Modo Cinema",
+        lightsOn: "Luzes Acesas",
+        close: "✕ Fechar",
+        episodes: "Episódios disponíveis:",
+        playMovie: "▶ Reproduzir Filme Agora",
+        play: "Assistir",
+        searching: "Pesquisando...",
+        historyTitle: "Histórico / Continuar Assistindo",
+        favTitle: "Lista de Favoritos",
+        noHistory: "Sem histórico recente neste perfil.",
+        noFavs: "Sem favoritos salvos neste perfil.",
+        trending: "Tendências Globais",
+        nowPlaying: "Estreias nos Cinemas",
+        popularTv: "Séries Populares",
+        moreContent: "Mais Conteúdo"
+    },
+    de: {
+        who: "Wer schaut heute?",
+        addProfile: "Profil hinzufügen",
+        history: "Verlauf",
+        mylist: "Meine Liste",
+        searchPlaceholder: "Titel suchen...",
+        all: "Alle",
+        action: "Action",
+        comedy: "Komödie",
+        horror: "Horror",
+        scifi: "Sci-Fi",
+        animation: "Animation",
+        loadingMore: "Lade mehr unendliche Inhalte...",
+        back: "← Zurück",
+        cineMode: "Kino-Modus",
+        lightsOn: "Licht an",
+        close: "✕ Schließen",
+        episodes: "Verfügbare Episoden:",
+        playMovie: "▶ Film Jetzt Abspielen",
+        play: "Ansehen",
+        searching: "Suche...",
+        historyTitle: "Verlauf / Weiterschauen",
+        favTitle: "Meine Favoriten",
+        noHistory: "Kein neuer Verlauf in diesem Profil.",
+        noFavs: "Keine Favoriten in diesem Profil.",
+        trending: "Globale Trends",
+        nowPlaying: "Jetzt im Kino",
+        popularTv: "Beliebte Serien",
+        moreContent: "Mehr Inhalte"
+    }
 };
 
-async function cargarBaseDatos() {
-    try {
-        const response = await fetch('videos.json');
-        const data = await response.json();
-        DB_PROPIA = data.manual_database || [];
-    } catch (e) { console.warn("Iniciando sin videos.json local."); }
+function t(key) {
+    return TRADUCCIONES[idiomaActual][key] || TRADUCCIONES['es'][key] || key;
 }
 
-document.getElementById('main-search').addEventListener('keypress', async (e) => {
-    if (e.key === 'Enter') {
-        const query = e.target.value;
-        if (!query) return;
-        appContainer.innerHTML = `<div class="py-20 text-center text-cyan-400 font-black animate-pulse uppercase tracking-[5px]">Buscando...</div>`;
-        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEYS.tmdb}&query=${query}&language=es-ES`);
-        const data = await res.json();
-        appContainer.innerHTML = `<h2 class="text-white font-black mb-10 uppercase italic">Resultados: ${query}</h2><div class="grid grid-cols-2 md:grid-cols-5 gap-6" id="search-grid"></div>`;
-        data.results.forEach(m => {
-            if (m.poster_path) {
-                const tipo = m.media_type || (m.title ? 'movie' : 'tv');
-                document.getElementById('search-grid').innerHTML += renderCard(m.id, m.title || m.name, m.poster_path, tipo, false);
-            }
-        });
+window.onload = async () => {
+    aplicarTemaPorHora();
+    document.getElementById('language-selector').value = idiomaActual;
+    actualizarTextosInterfaz();
+    verificarPerfiles();
+};
+
+function cambiarIdioma(nuevoLang) {
+    idiomaActual = nuevoLang;
+    localStorage.setItem('dv_idioma', nuevoLang);
+    actualizarTextosInterfaz();
+    location.reload(); // Recarga para aplicar traducciones en TMDB
+}
+
+function actualizarTextosInterfaz() {
+    document.getElementById('txt-who-is-watching').innerText = t('who');
+    document.getElementById('txt-add-profile').innerText = t('addProfile');
+    document.getElementById('txt-history').innerText = t('history');
+    document.getElementById('txt-mylist').innerText = t('mylist');
+    document.getElementById('main-search').placeholder = t('searchPlaceholder');
+    document.getElementById('btn-genre-all').innerText = t('all');
+    document.getElementById('btn-genre-action').innerText = t('action');
+    document.getElementById('btn-genre-comedy').innerText = t('comedy');
+    document.getElementById('btn-genre-horror').innerText = t('horror');
+    document.getElementById('btn-genre-scifi').innerText = t('scifi');
+    document.getElementById('btn-genre-animation').innerText = t('animation');
+    document.getElementById('txt-loading-more').innerText = t('loadingMore');
+    document.getElementById('btn-back').innerText = t('back');
+    document.getElementById('txt-close').innerText = t('close');
+    document.getElementById('txt-episodes').innerText = t('episodes');
+}
+
+function aplicarTemaPorHora() {
+    const hora = new Date().getHours();
+    const body = document.body;
+    const label = document.getElementById('time-theme-label');
+
+    if (hora >= 6 && hora < 13) {
+        body.classList.add('theme-morning');
+        if(label) label.innerText = "DV GLOBAL - Morning Mode Active";
+    } else if (hora >= 13 && hora < 20) {
+        body.classList.add('theme-afternoon');
+        if(label) label.innerText = "DV GLOBAL - Afternoon Mode Active";
+    } else {
+        body.classList.add('theme-night');
+        if(label) label.innerText = "DV GLOBAL - Night Mode Active";
     }
+}
+
+// 1. GESTIÓN DE PERFILES
+function obtenerPerfiles() {
+    return JSON.parse(localStorage.getItem('dv_perfiles')) || [
+        { id: '1', nombre: 'Creador', avatar: '👑' },
+        { id: '2', nombre: 'Invitado', avatar: '🍿' }
+    ];
+}
+
+function verificarPerfiles() {
+    const perfilGuardado = localStorage.getItem('dv_perfil_activo');
+    const perfiles = obtenerPerfiles();
+
+    if (perfilGuardado) {
+        perfilActual = JSON.parse(perfilGuardado);
+        document.getElementById('profile-modal').classList.add('hidden');
+        document.getElementById('current-profile-avatar').innerText = perfilActual.avatar;
+        document.getElementById('current-profile-name').innerText = perfilActual.nombre;
+        iniciarApp();
+    } else {
+        mostrarModalPerfiles(perfiles);
+    }
+}
+
+function mostrarModalPerfiles(perfiles) {
+    const grid = document.getElementById('profiles-grid');
+    grid.innerHTML = perfiles.map(p => `
+        <div onclick="seleccionarPerfil('${p.id}', '${p.nombre}', '${p.avatar}')" class="flex flex-col items-center gap-3 cursor-pointer group p-4 rounded-2xl hover:bg-white/5 transition-all">
+            <div class="w-20 h-20 rounded-2xl bg-zinc-900 border-2 border-white/10 group-hover:border-cyan-400 flex items-center justify-center text-3xl shadow-xl transition-all">
+                ${p.avatar}
+            </div>
+            <span class="text-xs font-bold text-zinc-300 group-hover:text-white uppercase tracking-wider">${p.nombre}</span>
+        </div>
+    `).join('');
+}
+
+function seleccionarPerfil(id, nombre, avatar) {
+    perfilActual = { id, nombre, avatar };
+    localStorage.setItem('dv_perfil_activo', JSON.stringify(perfilActual));
+    document.getElementById('profile-modal').classList.add('hidden');
+    document.getElementById('current-profile-avatar').innerText = avatar;
+    document.getElementById('current-profile-name').innerText = nombre;
+    iniciarApp();
+}
+
+function cambiarPerfilModal() {
+    localStorage.removeItem('dv_perfil_activo');
+    location.reload();
+}
+
+function crearNuevoPerfil() {
+    const nombre = prompt(t('addProfile') + ":");
+    if (!nombre) return;
+    const avatares = ['🚀', '⚡', '🐉', '🐱', '🔥', '💎', '🎮', '🌟'];
+    const avatar = avatares[Math.floor(Math.random() * avatares.length)];
+    let perfiles = obtenerPerfiles();
+    perfiles.push({ id: Date.now().toString(), nombre, avatar });
+    localStorage.setItem('dv_perfiles', JSON.stringify(perfiles));
+    mostrarModalPerfiles(perfiles);
+}
+
+// 2. INICIO Y SCROLL INFINITO
+async function iniciarApp() {
+    await cargarCatalogoPrincipal();
+    
+    window.addEventListener('scroll', () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            cargarMasContenidoInfinito();
+        }
+    });
+}
+
+async function cargarCatalogoPrincipal() {
+    currentMode = 'home';
+    appContainer.innerHTML = '';
+    pageToken = 1;
+    await cargarSeccionTMDB(t('historyTitle'), null, true);
+    await cargarSeccionTMDB(t('trending'), "trending/all/day");
+    await cargarSeccionTMDB(t('nowPlaying'), "movie/now_playing");
+    await cargarSeccionTMDB(t('popularTv'), "tv/popular");
+}
+
+async function cargarMasContenidoInfinito() {
+    if (currentMode !== 'home') return;
+    const loader = document.getElementById('infinite-loader');
+    if (!loader.classList.contains('hidden')) return;
+    
+    loader.classList.remove('hidden');
+    pageToken++;
+    
+    await cargarSeccionTMDB(`${t('moreContent')} (Página ${pageToken})`, `movie/popular`, false, `&page=${pageToken}`);
+    loader.classList.add('hidden');
+}
+
+// 3. BÚSQUEDA POR VOZ
+function activarBusquedaVoz() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Speech recognition not supported.");
+        return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = idiomaActual === 'es' ? 'es-ES' : idiomaActual === 'en' ? 'en-US' : idiomaActual === 'fr' ? 'fr-FR' : idiomaActual === 'pt' ? 'pt-BR' : 'de-DE';
+    const voiceBtn = document.getElementById('voice-btn');
+    voiceBtn.classList.add('text-cyan-400', 'animate-bounce');
+
+    recognition.onresult = (event) => {
+        const texto = event.results[0][0].transcript;
+        document.getElementById('main-search').value = texto;
+        voiceBtn.classList.remove('text-cyan-400', 'animate-bounce');
+        ejecutarBusqueda(texto);
+    };
+
+    recognition.onerror = recognition.onend = () => {
+        voiceBtn.classList.remove('text-cyan-400', 'animate-bounce');
+    };
+
+    recognition.start();
+}
+
+document.getElementById('main-search').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') ejecutarBusqueda(e.target.value);
 });
 
-async function cargarSeccionTMDB(titulo, path, params = "") {
-    const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEYS.tmdb}&language=es-ES${params}`);
+async function ejecutarBusqueda(query) {
+    if (!query) return;
+    currentMode = 'search';
+    appContainer.innerHTML = `<div class="py-20 text-center font-black animate-pulse uppercase tracking-[5px] accent-color">${t('searching')}</div>`;
+    const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEYS.tmdb}&query=${query}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
     const data = await res.json();
-    renderFila(titulo, data.results.map(m => ({ id: m.id, title: m.title || m.name, img: m.poster_path, tipo: m.media_type || (path.includes('movie') ? 'movie' : 'tv') })));
+    appContainer.innerHTML = `<h2 class="text-white font-black mb-6 uppercase italic">${t('searching')} ${query}</h2><div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="search-grid"></div>`;
+    data.results.forEach(m => {
+        if (m.poster_path) {
+            const tipo = m.media_type || (m.title ? 'movie' : 'tv');
+            document.getElementById('search-grid').innerHTML += renderCard(m.id, m.title || m.name, `https://image.tmdb.org/t/p/w400${m.poster_path}`, tipo);
+        }
+    });
 }
 
-async function cargarSeccionTrakt(titulo, endpoint) {
+// 4. FILTROS Y RENDERIZADO
+async function filtrarPorGenero(genreId, nombreGenero) {
+    currentMode = 'genre';
+    document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('bg-white/10', 'active-genre'));
+    event.target.classList.add('bg-white/10', 'active-genre');
+
+    if (genreId === 'all') {
+        cargarCatalogoPrincipal();
+        return;
+    }
+
+    appContainer.innerHTML = `<h2 class="text-white font-black mb-6 uppercase italic text-lg">Genre: ${nombreGenero}</h2><div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="genre-grid"></div>`;
+    
+    const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${KEYS.tmdb}&with_genres=${genreId}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
+    const data = await res.json();
+    
+    const grid = document.getElementById('genre-grid');
+    data.results.forEach(m => {
+        if (m.poster_path) {
+            grid.innerHTML += renderCard(m.id, m.title, `https://image.tmdb.org/t/p/w400${m.poster_path}`, 'movie', m.vote_average?.toFixed(1));
+        }
+    });
+}
+
+async function cargarSeccionTMDB(titulo, path, isHistorial = false, extraParams = "") {
+    if (isHistorial) {
+        const historial = obtenerHistorial();
+        if (historial.length === 0) return;
+        renderFilaPersonalizada(titulo, historial);
+        return;
+    }
+
     try {
-        const res = await fetch(`https://api.trakt.tv/${endpoint}`, { headers: { 'trakt-api-version': '2', 'trakt-api-key': KEYS.trakt } });
+        const res = await fetch(`https://api.themoviedb.org/3/${path}?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}${extraParams}`);
         const data = await res.json();
-        renderFila(titulo, data.slice(0, 10).map(entry => ({ id: entry.movie ? entry.movie.ids.tmdb : entry.show.ids.tmdb, tipo: entry.movie ? 'movie' : 'tv', needsImg: true })));
-    } catch (e) { console.error("Trakt no responde."); }
-}
-
-async function cargarSeccionTVMaze(titulo, query) {
-    const res = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
-    const data = await res.json();
-    renderFila(titulo, data.map(i => ({ id: i.show.externals.thetvdb || i.show.id, title: i.show.name, img: i.show.image ? i.show.image.medium : null, tipo: 'tv', isFullUrl: true })));
+        renderFila(titulo, data.results.map(m => ({ 
+            id: m.id, 
+            title: m.title || m.name, 
+            img: `https://image.tmdb.org/t/p/w400${m.poster_path}`, 
+            tipo: m.media_type || (path.includes('tv') ? 'tv' : 'movie'),
+            vote: m.vote_average ? m.vote_average.toFixed(1) : null
+        })));
+    } catch (e) { console.error("Error:", titulo); }
 }
 
 function renderFila(titulo, items) {
     const section = document.createElement('div');
-    section.className = "mb-14";
-    section.innerHTML = `<h2 class="text-[10px] font-black uppercase text-cyan-400 mb-6 tracking-[6px] italic ml-2">${titulo}</h2><div class="flex gap-5 overflow-x-auto pb-8 scroll-hide px-2"></div>`;
+    section.className = "mb-10";
+    section.innerHTML = `<h2 class="text-xs font-black uppercase tracking-[4px] italic ml-1 mb-4 opacity-90">${titulo}</h2><div class="flex gap-4 overflow-x-auto pb-4 scroll-hide px-1"></div>`;
     const row = section.querySelector('div');
-    items.forEach(async item => {
-        let poster = item.isFullUrl ? item.img : `https://image.tmdb.org/t/p/w400${item.img}`;
-        if (item.needsImg) {
-            const r = await fetch(`https://api.themoviedb.org/3/${item.tipo}/${item.id}?api_key=${KEYS.tmdb}`);
-            const d = await r.json();
-            poster = `https://image.tmdb.org/t/p/w400${d.poster_path}`;
+    items.forEach(item => {
+        if (item.img && !item.img.includes('null')) {
+            row.innerHTML += renderCard(item.id, item.title, item.img, item.tipo, item.vote);
         }
-        if (poster && !poster.includes('null')) row.innerHTML += renderCard(item.id, item.title, poster, item.tipo, true);
     });
     appContainer.appendChild(section);
 }
 
-function renderCard(id, title, img, tipo, isImgReady) {
-    const poster = isImgReady ? img : `https://image.tmdb.org/t/p/w400${img}`;
+function renderFilaPersonalizada(titulo, items) {
+    const section = document.createElement('div');
+    section.className = "mb-10";
+    section.innerHTML = `<h2 class="text-xs font-black uppercase tracking-[4px] italic ml-1 mb-4 text-cyan-400">${titulo}</h2><div class="flex gap-4 overflow-x-auto pb-4 scroll-hide px-1"></div>`;
+    const row = section.querySelector('div');
+    items.forEach(item => {
+        row.innerHTML += renderCard(item.id, item.title, item.img, item.tipo, null, item.progress);
+    });
+    appContainer.appendChild(section);
+}
+
+function renderCard(id, title, poster, tipo, vote = null, progress = null) {
+    const escapedTitle = (title || "").replace(/'/g, "\\'");
+    const esFav = comprobarFavorito(id);
+
     return `
-        <div class="movie-card min-w-[165px] md:min-w-[195px] h-[245px] md:h-[290px] bg-cover bg-center shadow-2xl relative group overflow-hidden" 
-             onclick="gestionarSeleccion(${id}, '${tipo}')" 
-             style="background-image:url('${poster}')">
-             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                 <span class="text-xs font-bold text-white truncate">${title || ''}</span>
-             </div>
-        </div>`;
+    <div class="movie-card min-w-[140px] md:min-w-[180px] h-[210px] md:h-[270px] bg-cover bg-center shadow-xl relative group overflow-hidden" style="background-image:url('${poster}')" onclick="gestionarSeleccion(${id}, '${tipo}')">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+            ${vote ? `<span class="text-[9px] bg-cyan-500/80 text-black font-black px-1.5 py-0.5 rounded w-fit mb-1">★ ${vote}</span>` : ''}
+            <div class="text-[11px] font-bold truncate mb-2">${title}</div>
+            <div class="flex gap-2" onclick="event.stopPropagation()">
+                <button onclick="gestionarSeleccion(${id}, '${tipo}')" class="flex-1 accent-bg text-black text-[10px] font-black py-1.5 rounded-md uppercase">${t('play')}</button>
+                <button onclick="toggleFavorito(event, ${id}, '${escapedTitle}', '${poster}', '${tipo}')" class="bg-white/20 hover:bg-white/40 px-2.5 py-1.5 rounded-md text-xs">
+                    <i class="fa-${esFav ? 'solid text-red-500' : 'regular'} fa-heart"></i>
+                </button>
+            </div>
+        </div>
+        ${progress ? `<div class="absolute bottom-0 left-0 w-full h-1 bg-white/20"><div class="h-full bg-cyan-400" style="width: ${progress}%"></div></div>` : ''}
+    </div>`;
 }
 
+// 5. HISTORIAL Y FAVORITOS
+function obtenerHistorial() { 
+    if (!perfilActual) return [];
+    return JSON.parse(localStorage.getItem(`dv_historial_${perfilActual.id}`)) || []; 
+}
+function guardarHistorial(id, title, img, tipo) {
+    if (!perfilActual) return;
+    let hist = obtenerHistorial().filter(h => h.id !== id);
+    hist.unshift({ id, title, img, tipo, progress: Math.floor(Math.random() * 60) + 20 });
+    if (hist.length > 10) hist.pop();
+    localStorage.setItem(`dv_historial_${perfilActual.id}`, JSON.stringify(hist));
+}
+
+function mostrarContinuarViendo() {
+    currentMode = 'history';
+    const hist = obtenerHistorial();
+    appContainer.innerHTML = `
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-white font-black uppercase italic text-lg">${t('historyTitle')}</h2>
+            <button onclick="location.reload()" class="text-xs px-3 py-1.5 rounded-xl border border-white/10">${t('back')}</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="hist-grid"></div>
+    `;
+    const grid = document.getElementById('hist-grid');
+    if (hist.length === 0) {
+        grid.innerHTML = `<p class="text-zinc-500 text-xs col-span-full">${t('noHistory')}</p>`;
+        return;
+    }
+    hist.forEach(h => { grid.innerHTML += renderCard(h.id, h.title, h.img, h.tipo, null, h.progress); });
+}
+
+function obtenerFavoritos() { 
+    if (!perfilActual) return [];
+    return JSON.parse(localStorage.getItem(`dv_favoritos_${perfilActual.id}`)) || []; 
+}
+function comprobarFavorito(id) { return obtenerFavoritos().some(f => f.id === id); }
+
+function toggleFavorito(event, id, title, img, tipo) {
+    event.stopPropagation();
+    if (!perfilActual) return;
+    let favs = obtenerFavoritos();
+    const index = favs.findIndex(f => f.id === id);
+    if (index >= 0) favs.splice(index, 1);
+    else favs.push({ id, title, img, tipo });
+    localStorage.setItem(`dv_favoritos_${perfilActual.id}`, JSON.stringify(favs));
+    location.reload();
+}
+
+function mostrarFavoritos() {
+    currentMode = 'favorites';
+    const favs = obtenerFavoritos();
+    appContainer.innerHTML = `
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-white font-black uppercase italic text-lg">${t('favTitle')}</h2>
+            <button onclick="location.reload()" class="text-xs px-3 py-1.5 rounded-xl border border-white/10">${t('back')}</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="fav-grid"></div>
+    `;
+    const grid = document.getElementById('fav-grid');
+    if (favs.length === 0) {
+        grid.innerHTML = `<p class="text-zinc-500 text-xs col-span-full">${t('noFavs')}</p>`;
+        return;
+    }
+    favs.forEach(f => { grid.innerHTML += renderCard(f.id, f.title, f.img, f.tipo); });
+}
+
+// 6. MODALES Y REPRODUCTOR
 function gestionarSeleccion(id, tipo) {
-    if (tipo === 'tv' || tipo === 'show') abrirModalSerie(id);
-    else lanzarReproductor(id, 'movie');
+    abrirModalSerie(id, tipo);
 }
 
-async function abrirModalSerie(id) {
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${KEYS.tmdb}&language=es-ES`);
+async function abrirModalSerie(id, tipo) {
+    const endpoint = tipo === 'tv' ? `tv/${id}` : `movie/${id}`;
+    const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
     const data = await res.json();
-    document.getElementById('modal-title').innerText = data.name;
+    
+    const title = data.name || data.title;
+    const poster = `https://image.tmdb.org/t/p/w400${data.poster_path}`;
+
+    document.getElementById('modal-title').innerText = title;
     document.getElementById('modal-desc').innerText = data.overview;
-    document.getElementById('seasons-container').innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `<div class="bg-zinc-900 p-4 rounded-2xl border border-white/5 hover:border-cyan-500 cursor-pointer text-center" onclick="cargarEpisodios(${id}, ${s.season_number})"><span class="text-[10px] font-black uppercase italic">${s.name}</span></div>`).join('');
+    
+    cargarTrailer(id, tipo);
+
+    if (tipo === 'tv') {
+        document.getElementById('seasons-container').innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `
+            <div class="bg-zinc-900 p-3 rounded-xl border border-white/5 hover:border-cyan-400 cursor-pointer text-center" onclick="cargarEpisodios(${id}, ${s.season_number}, '${title.replace(/'/g, "\\'")}', '${poster}')">
+                <span class="text-[10px] font-black uppercase italic">${s.name}</span>
+            </div>
+        `).join('');
+        document.getElementById('seasons-container').classList.remove('hidden');
+    } else {
+        document.getElementById('seasons-container').innerHTML = `
+            <button onclick="guardarHistorial(${id}, '${title.replace(/'/g, "\\'")}', '${poster}', 'movie'); lanzarReproductor(${id}, 'movie')" class="col-span-full accent-bg text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">
+                ${t('playMovie')}
+            </button>
+        `;
+    }
+
     document.getElementById('series-modal').classList.remove('hidden');
     document.getElementById('episodes-container').classList.add('hidden');
 }
 
-async function cargarEpisodios(id, sNum) {
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${sNum}?api_key=${KEYS.tmdb}&language=es-ES`);
+async function cargarTrailer(id, tipo) {
+    const box = document.getElementById('trailer-container');
+    const frameBox = document.getElementById('trailer-frame-box');
+    const res = await fetch(`https://api.themoviedb.org/3/${tipo}/${id}/videos?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
     const data = await res.json();
-    document.getElementById('episodes-list').innerHTML = data.episodes.map(e => `<div class="bg-white/5 p-4 rounded-xl flex justify-between items-center hover:bg-white/10 cursor-pointer group" onclick="lanzarReproductor(${id}, 'tv', ${sNum}, ${e.episode_number})"><span class="text-xs italic"><b class="text-cyan-400 mr-3">${e.episode_number}</b> ${e.name}</span></div>`).join('');
-    document.getElementById('episodes-container').classList.remove('hidden');
-}
-
-// 6. MOTOR REPRODUCTOR EXTREMO CON ENRUTAMIENTO FORZADO DE IDIOMA NATIVO
-function lanzarReproductor(id, tipo, s=1, e=1) {
-    const selector = document.getElementById('server-selector');
-    const playerView = document.getElementById('player-view');
     
-    playerView.classList.add('active');
-    document.getElementById('series-modal').classList.add('hidden'); 
-
-    // URLs directas con nodos de indexación independientes por idioma real
-    const servidoresAvanzados = [
-        {
-            pais: "🇲🇽",
-            nombre: "LATINO (Opción A)",
-            desc: "Forzado Español Latino",
-            url: tipo === 'movie' ? `https://embed.warezcdn.link/movie/${id}` : `https://embed.warezcdn.link/serie/${id}/${s}/${e}`
-        },
-        {
-            pais: "🇲🇽",
-            nombre: "LATINO (Opción B)",
-            desc: "Multi-Audio Latino HD",
-            url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}?auto_play=1&locale=la` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}?auto_play=1&locale=la`
-        },
-        {
-            pais: "🇪🇸",
-            nombre: "CASTELLANO (España)",
-            desc: "Servidor Exclusivo España",
-            url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}&ds_lang=es` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}&ds_lang=es`
-        },
-        {
-            pais: "🇺🇸",
-            nombre: "ENGLISH (Original)",
-            desc: "Audio Nativo Inglés",
-            url: tipo === 'movie' ? `https://vidsrc.net/embed/movie/${id}` : `https://vidsrc.net/embed/tv/${id}/${s}/${e}`
-        },
-        {
-            pais: "🇯🇵",
-            nombre: "JAPONÉS (Subtitulado)",
-            desc: "Audio Original Japonés",
-            url: tipo === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`
-        },
-        {
-            pais: "🇫🇷",
-            nombre: "FRANÇAIS",
-            desc: "Audio Français",
-            url: tipo === 'movie' ? `https://vidsrc.pm/embed/movie/${id}?lang=fr` : `https://vidsrc.pm/embed/tv/${id}/${s}/${e}?lang=fr`
-        },
-        {
-            pais: "🇩🇪",
-            nombre: "DEUTSCH",
-            desc: "Audio Deutsch",
-            url: tipo === 'movie' ? `https://vidsrc.xyz/embed/movie/${id}?lang=de` : `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}?lang=de`
-        }
-    ];
-
-    selector.innerHTML = servidoresAvanzados.map((serv, index) => `
-        <button onclick="cambiarServidor('${serv.url}', this)" class="server-btn flex items-center gap-2 bg-zinc-900 border border-white/10 hover:border-cyan-500 p-2.5 rounded-xl text-left transition-all group ${index === 0 ? 'border-cyan-500 bg-zinc-800' : ''}">
-            <span class="text-xl">${serv.pais}</span>
-            <div class="overflow-hidden">
-                <div class="text-[10px] font-black text-cyan-400 group-hover:text-white uppercase truncate">${serv.nombre}</div>
-                <div class="text-[8px] text-zinc-400 truncate">${serv.desc}</div>
-            </div>
-        </button>
-    `).join('');
-
-    cambiarServidor(servidoresAvanzados[0].url);
-}
-
-function cambiarServidor(url, btnElement) {
-    const root = document.getElementById('video-root');
-    root.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>`;
-
-    if (btnElement) {
-        document.querySelectorAll('.server-btn').forEach(b => {
-            b.classList.remove('border-cyan-500', 'bg-zinc-800');
-        });
-        btnElement.classList.add('border-cyan-500', 'bg-zinc-800');
+    const trailer = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+    if (trailer) {
+        frameBox.innerHTML = `<iframe src="https://www.youtube.com/embed/${trailer.key}" allowfullscreen></iframe>`;
+        box.classList.remove('hidden');
+    } else {
+        box.classList.add('hidden');
     }
 }
 
-function cerrarPlayer() { 
-    const playerView = document.getElementById('player-view');
-    const root = document.getElementById('video-root');
-    
-    playerView.classList.remove('active');
-    root.innerHTML = ''; 
+async function cargarEpisodios(id, sNum, serieTitle, poster) {
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${sNum}?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
+    const data = await res.json();
+    document.getElementById('episodes-list').innerHTML = data.episodes.map(e => `
+        <div class="bg-white/5 p-3 rounded-lg flex justify-between items-center hover:bg-white/10 cursor-pointer" onclick="guardarHistorial(${id}, '${serieTitle}', '${poster}', 'tv'); lanzarReproductor(${id}, 'tv', ${sNum}, ${e.episode_number})">
+            <span class="text-xs"><b class="mr-2">${e.episode_number}.</b> ${e.name}</span>
+            <span class="text-[10px] text-cyan-400 uppercase font-bold">${t('play')}</span>
+        </div>
+    `).join('');
+    document.getElementById('episodes-container').classList.remove('hidden');
+}
+
+function lanzarReproductor(id, tipo, s=1, e=1) {
+    const selector = document.getElementById('server-selector');
+    document.getElementById('player-view').classList.remove('hidden');
+    document.getElementById('series-modal').classList.add('hidden');
+
+    const servidores = [
+        { pais: "🇲🇽", nombre: "LATINO 1", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+        { pais: "🇪🇸", nombre: "CASTELLANO", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
+        { pais: "🌐", nombre: "FILEMOON", url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` }
+    ];
+
+    selector.innerHTML = servidores.map(serv => `
+        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-2 bg-zinc-900 border border-white/10 p-2 rounded-xl text-left hover:border-white">
+            <span class="text-lg">${serv.pais}</span>
+            <div class="text-[10px] font-black uppercase">${serv.nombre}</div>
+        </button>
+    `).join('');
+
+    cambiarServidor(servidores[0].url);
+}
+
+function cambiarServidor(url) {
+    document.getElementById('video-root').innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+}
+
+function toggleModoCine() {
+    document.body.classList.toggle('modo-cine-activo');
+    const btn = document.getElementById('cine-btn');
+    if (document.body.classList.contains('modo-cine-activo')) {
+        btn.innerHTML = `<i class="fa-solid fa-lightbulb text-yellow-400"></i> ${t('lightsOn')}`;
+    } else {
+        btn.innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${t('cineMode')}`;
+    }
+}
+
+function cerrarPlayer() {
+    document.getElementById('player-view').classList.add('hidden');
+    document.getElementById('video-root').innerHTML = '';
+    document.body.classList.remove('modo-cine-activo');
+    location.reload();
 }
 
 function cerrarModalSeries() { 
     document.getElementById('series-modal').classList.add('hidden'); 
+    document.getElementById('trailer-frame-box').innerHTML = '';
 }
