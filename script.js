@@ -624,3 +624,84 @@ function cerrarModalSeries() {
     document.getElementById('series-modal').classList.add('hidden'); 
     document.getElementById('trailer-frame-box').innerHTML = '';
 }
+
+// Configuración de tu cuenta de Real-Debrid
+const REAL_DEBRID_API_KEY = "TU_API_KEY_DE_REAL_DEBRID"; // Pega aquí tu token
+const RD_BASE_URL = "https://api.real-debrid.com/rest/1.0";
+
+// 1. Obtener la lista de torrents/archivos en tu nube de Real-Debrid
+async function rdObtenerTorrents() {
+    try {
+        const response = await fetch(`${RD_BASE_URL}/torrents`, {
+            headers: {
+                "Authorization": `Bearer ${REAL_DEBRID_API_KEY}`
+            }
+        });
+        if (!response.ok) throw new Error("Error al conectar con Real-Debrid");
+        const torrents = await response.json();
+        return torrents; // Devuelve la lista de tus archivos en la nube
+    } catch (error) {
+        console.error("Error en Real-Debrid:", error);
+        return [];
+    }
+}
+
+// 2. Obtener los enlaces de descarga/streaming directos de un torrent específico
+async function rdObtenerEnlacesTorrent(torrentId) {
+    try {
+        const response = await fetch(`${RD_BASE_URL}/torrents/info/${torrentId}`, {
+            headers: {
+                "Authorization": `Bearer ${REAL_DEBRID_API_KEY}`
+            }
+        });
+        const data = await response.json();
+        return data.links; // Enlaces listos para reproducir
+    } catch (error) {
+        console.error("Error al obtener enlaces del torrent:", error);
+        return [];
+    }
+}
+
+// 3. Desbloquear/Generar el enlace final de streaming directo
+async function rdDesbloquearEnlace(linkRestringido) {
+    try {
+        const formData = new URLSearchParams();
+        formData.append("link", linkRestringido);
+
+        const response = await fetch(`${RD_BASE_URL}/unrestrict/link`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${REAL_DEBRID_API_KEY}`,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        return data.download; // URL directa de video limpia (con soporte multiaudio)
+    } catch (error) {
+        console.error("Error al desbloquear el enlace:", error);
+        return null;
+    }
+}
+async function lanzarReproductorRealDebrid(torrentIdLink) {
+    // 1. Desbloqueamos el enlace restringido de tu nube
+    const enlaceDirecto = await rdDesbloquearEnlace(torrentIdLink);
+    
+    if (!enlaceDirecto) {
+        alert("No se pudo cargar el archivo desde Real-Debrid.");
+        return;
+    }
+
+    // 2. Mostramos el reproductor en la interfaz
+    document.getElementById('player-view').classList.remove('hidden');
+    document.getElementById('series-modal').classList.add('hidden');
+
+    // 3. Inyectamos el archivo de video directo (este reproductor nativo sí permite cambiar de pista de audio si el archivo es multiaudio)
+    document.getElementById('video-root').innerHTML = `
+        <video controls autoplay class="w-full h-full object-contain bg-black">
+            <source src="${enlaceDirecto}" type="video/mp4">
+            Tu navegador no soporta la reproducción de video HTML5.
+        </video>
+    `;
+}
