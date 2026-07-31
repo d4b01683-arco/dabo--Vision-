@@ -3,58 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>DV GLOBAL - Multi-API System</title>
+    <title>DV GLOBAL - Infinite Supreme Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="transition-colors duration-700">
 
-    <nav class="fixed top-0 w-full z-[100] bg-black/90 backdrop-blur-md border-b border-white/5 p-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
-            <h1 class="text-2xl font-black text-cyan-400 italic tracking-tighter cursor-pointer" onclick="location.reload()">DV GLOBAL</h1>
-            <div class="relative w-full md:w-1/2">
-                <input type="text" id="main-search" placeholder="Buscar en bases de datos..." 
-                    class="w-full bg-white/10 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 ring-cyan-500 text-sm">
+    <div id="profile-modal" class="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center p-6 transition-all duration-500">
+        <h1 class="text-3xl md:text-5xl font-black italic tracking-tighter accent-color mb-2">DV GLOBAL</h1>
+        <p id="txt-who-is-watching" class="text-zinc-400 text-xs md:text-sm mb-10 tracking-widest uppercase">¿Quién está viendo hoy?</p>
+        <div id="profiles-grid" class="flex flex-wrap justify-center gap-6 mb-8"></div>
+        <button onclick="crearNuevoPerfil()" class="bg-white/5 border border-white/10 hover:border-cyan-400 text-xs font-bold px-6 py-3 rounded-2xl flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-plus text-cyan-400"></i> <span id="txt-add-profile">Añadir Perfil</span>
+        </button>
+    </div>
+
+    <nav class="fixed top-0 w-full z-[100] glass-nav backdrop-blur-md border-b border-white/5 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-xl font-black italic tracking-tighter cursor-pointer accent-color" onclick="location.reload()">DV GLOBAL</h1>
+                    <button onclick="cambiarPerfilModal()" class="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-xl text-xs font-bold hover:bg-white/10">
+                        <span id="current-profile-avatar" class="text-base">👤</span>
+                        <span id="current-profile-name" class="hidden md:inline">Perfil</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <select id="language-selector" onchange="cambiarIdioma(this.value)" class="bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-xl text-xs font-bold outline-none cursor-pointer hover:bg-white/10 text-cyan-400">
+                        <option value="es" class="bg-zinc-900 text-white">🇪🇸 ES</option>
+                        <option value="en" class="bg-zinc-900 text-white">🇺🇸 EN</option>
+                        <option value="fr" class="bg-zinc-900 text-white">🇫🇷 FR</option>
+                        <option value="pt" class="bg-zinc-900 text-white">🇧🇷 PT</option>
+                        <option value="de" class="bg-zinc-900 text-white">🇩🇪 DE</option>
+                    </select>
+
+                    <button onclick="mostrarContinuarViendo()" class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-white/10 flex items-center gap-1.5">
+                        <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span id="txt-history" class="hidden md:inline">Historial</span>
+                    </button>
+                    <button onclick="mostrarFavoritos()" class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-white/10 flex items-center gap-1.5">
+                        <i class="fa-solid fa-heart text-red-500"></i> <span id="txt-mylist" class="hidden md:inline">Mi Lista</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto scroll-hide pb-1">
+                <button onclick="filtrarPorGenero('all', 'Inicio')" class="bg-white/10 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn active-genre" id="btn-genre-all">Todo</button>
+                <button onclick="filtrarPorGenero(28, 'Acción')" class="bg-white/5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn hover:bg-white/10" id="btn-genre-action">Acción</button>
+                <button onclick="filtrarPorGenero(35, 'Comedia')" class="bg-white/5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn hover:bg-white/10" id="btn-genre-comedy">Comedia</button>
+                <button onclick="filtrarPorGenero(27, 'Terror')" class="bg-white/5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn hover:bg-white/10" id="btn-genre-horror">Terror</button>
+                <button onclick="filtrarPorGenero(878, 'Ciencia Ficción')" class="bg-white/5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn hover:bg-white/10" id="btn-genre-scifi">Ciencia Ficción</button>
+                <button onclick="filtrarPorGenero(16, 'Animación')" class="bg-white/5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap genre-btn hover:bg-white/10" id="btn-genre-animation">Animación</button>
+                
+                <div class="relative flex-1 min-w-[160px] flex items-center">
+                    <input type="text" id="main-search" placeholder="Buscar título..." 
+                        class="w-full bg-white/5 border border-white/10 pl-3 pr-9 py-1 rounded-full outline-none text-xs focus:border-cyan-400">
+                    <button onclick="activarBusquedaVoz()" id="voice-btn" class="absolute right-2.5 text-zinc-400 hover:text-white text-xs" title="Buscar por voz">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main id="app-content" class="pt-32 px-4 pb-20 max-w-7xl mx-auto space-y-12">
+    <main id="app-content" class="pt-36 px-2 md:px-6 pb-24 max-w-7xl mx-auto space-y-10">
         <div id="catalog-results"></div>
+        <div id="infinite-loader" class="py-10 text-center hidden">
+            <span id="txt-loading-more" class="text-xs font-black uppercase tracking-[5px] accent-color animate-pulse">Cargando más contenido infinito...</span>
+        </div>
     </main>
 
-    <div id="player-view" class="fixed inset-0 z-[200] bg-black hidden flex-col">
+    <div id="player-view" class="fixed inset-0 z-[200] bg-black hidden flex-col transition-all duration-300">
         <div class="p-4 flex flex-col md:flex-row justify-between items-center bg-zinc-950 border-b border-white/10 gap-4">
-            <button onclick="cerrarPlayer()" class="text-xs font-black text-white/60 hover:text-cyan-400 uppercase tracking-widest bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all">
-                ← VOLVER AL CATÁLOGO
-            </button>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <button onclick="cerrarPlayer()" id="btn-back" class="text-xs font-black text-white/60 hover:text-white uppercase tracking-widest bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all">
+                    ← Volver
+                </button>
+                <button onclick="toggleModoCine()" id="cine-btn" class="text-xs font-bold bg-white/5 px-3 py-2 rounded-xl border border-white/10 hover:bg-white/10 text-cyan-400">
+                    <i class="fa-solid fa-lightbulb"></i> <span id="txt-cine-mode">Modo Cine</span>
+                </button>
+            </div>
             <div id="server-selector" class="grid grid-cols-2 md:grid-cols-4 gap-2 w-full md:w-auto"></div>
         </div>
-        <div id="video-root" class="flex-1 w-full h-full"></div>
+        <div id="video-root" class="flex-1 w-full h-full relative"></div>
     </div>
 
     <div id="series-modal" class="fixed inset-0 z-[150] bg-black/95 hidden overflow-y-auto p-6 backdrop-blur-lg">
         <div class="max-w-4xl mx-auto pt-16">
-            <div class="flex justify-between items-start mb-8">
+            <div class="flex justify-between items-start mb-6">
                 <div>
-                    <h2 id="modal-title" class="text-3xl font-black italic uppercase text-cyan-400"></h2>
+                    <h2 id="modal-title" class="text-3xl font-black italic uppercase accent-color"></h2>
                     <p id="modal-desc" class="text-gray-400 text-sm mt-2 max-w-2xl"></p>
                 </div>
-                <button onclick="cerrarModalSeries()" class="text-white bg-white/10 px-4 py-2 rounded-xl font-bold hover:bg-white/20">✕ Cerrar</button>
+                <button onclick="cerrarModalSeries()" id="txt-close" class="text-white bg-white/10 px-4 py-2 rounded-xl font-bold hover:bg-white/20">✕ Cerrar</button>
             </div>
             
+            <div id="trailer-container" class="mb-8 hidden">
+                <div class="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 bg-zinc-900" id="trailer-frame-box"></div>
+            </div>
+
             <div id="seasons-container" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10"></div>
             
             <div id="episodes-container" class="hidden animate-fade-in">
-                <h3 class="text-cyan-400 font-bold mb-4 text-xs uppercase tracking-[3px]">Episodios disponibles:</h3>
+                <h3 id="txt-episodes" class="font-bold mb-4 text-xs uppercase tracking-[3px] opacity-75">Episodios disponibles:</h3>
                 <div id="episodes-list" class="grid grid-cols-1 gap-2"></div>
             </div>
         </div>
     </div>
 
-    <footer class="py-10 text-center border-t border-white/5 bg-zinc-950/50">
-        <span class="text-[10px] text-white/30 uppercase tracking-[3px]">DV GLOBAL - Core System Active</span>
+    <footer class="py-8 text-center border-t border-white/5 bg-zinc-950/40">
+        <span id="time-theme-label" class="text-[10px] uppercase tracking-[3px] opacity-40">DV GLOBAL - Infinite Multi-Language Active</span>
     </footer>
 
     <script src="script.js"></script>
