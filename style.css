@@ -1,44 +1,29 @@
-body { 
-    background: #000; 
-    color: #fff; 
-    font-family: 'Inter', sans-serif; 
-    overflow-x: hidden; 
-    -webkit-tap-highlight-color: transparent; /* Elimina el brillo molesto al tocar en iOS */
+:root {
+    --bg-main: #000000;
+    --accent: #00e5ff;
+    --card-border: rgba(255, 255, 255, 0.08);
 }
 
+body { background-color: var(--bg-main); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+.accent-color { color: var(--accent); }
+.accent-bg { background-color: var(--accent); }
+
+body.theme-morning { --bg-main: #080c14; --accent: #38bdf8; }
+body.theme-afternoon { --bg-main: #120a08; --accent: #fb923c; }
+body.theme-night { --bg-main: #000000; --accent: #a855f7; }
+
+.glass-nav { background: rgba(0, 0, 0, 0.85); }
 .scroll-hide::-webkit-scrollbar { display: none; }
 .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 .movie-card { 
-    transition: transform 0.2s ease; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
     flex-shrink: 0; 
     cursor: pointer; 
-    border-radius: 1rem; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    pointer-events: auto !important; /* Fuerza la interacción táctil */
-    touch-action: manipulation;
+    border-radius: 0.75rem; 
+    border: 1px solid var(--card-border); 
 }
+.movie-card:hover { transform: scale(1.06); border-color: var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
 
-.movie-card:active { 
-    transform: scale(0.95); 
-}
-
-#player-view {
-    display: none;
-}
-#player-view.active {
-    display: flex !important;
-}
-
-#video-root {
-    width: 100%;
-    height: calc(100vh - 120px);
-    background: #000;
-}
-
-iframe { 
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: #000; 
-}
+body.modo-cine-activo .glass-nav, body.modo-cine-activo footer { opacity: 0.05; pointer-events: none; }
+iframe { background: #000; width: 100%; height: 100%; border: none; }
