@@ -512,118 +512,106 @@ function mostrarFavoritos() {
         return;
     }
     favs.forEach(f => { grid.innerHTML += renderCard(f.id, f.title, f.img, f.tipo); });
-}
+} '';
+// Configuración de tu cuenta de Real-Debrid conectada a DV GLOBAL
+const REAL_DEBRID_API_KEY = "PEGA_AQUÍ_TU_API_KEY_DE_REAL_DEBRID"; 
 
-// 6. MODALES Y REPRODUCTOR
-function gestionarSeleccion(id, tipo) {
-    abrirModalSerie(id, tipo);
-}
-
-async function abrirModalSerie(id, tipo) {
-    const endpoint = tipo === 'tv' ? `tv/${id}` : `movie/${id}`;
-    const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
-    const data = await res.json();
-    
-    const title = data.name || data.title;
-    const poster = `https://image.tmdb.org/t/p/w400${data.poster_path}`;
-
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('modal-desc').innerText = data.overview;
-    
-    cargarTrailer(id, tipo);
-
-    if (tipo === 'tv') {
-        document.getElementById('seasons-container').innerHTML = data.seasons.filter(s => s.season_number > 0).map(s => `
-            <div class="bg-zinc-900 p-3 rounded-xl border border-white/5 hover:border-cyan-400 cursor-pointer text-center" onclick="cargarEpisodios(${id}, ${s.season_number}, '${title.replace(/'/g, "\\'")}', '${poster}')">
-                <span class="text-[10px] font-black uppercase italic">${s.name}</span>
-            </div>
-        `).join('');
-        document.getElementById('seasons-container').classList.remove('hidden');
-    } else {
-        document.getElementById('seasons-container').innerHTML = `
-            <button onclick="guardarHistorial(${id}, '${title.replace(/'/g, "\\'")}', '${poster}', 'movie'); lanzarReproductor(${id}, 'movie')" class="col-span-full accent-bg text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">
-                ${t('playMovie')}
-            </button>
-        `;
-    }
-
-    document.getElementById('series-modal').classList.remove('hidden');
-    document.getElementById('episodes-container').classList.add('hidden');
-}
-
-async function cargarTrailer(id, tipo) {
-    const box = document.getElementById('trailer-container');
-    const frameBox = document.getElementById('trailer-frame-box');
-    const res = await fetch(`https://api.themoviedb.org/3/${tipo}/${id}/videos?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
-    const data = await res.json();
-    
-    const trailer = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-    if (trailer) {
-        frameBox.innerHTML = `<iframe src="https://www.youtube.com/embed/${trailer.key}" allowfullscreen></iframe>`;
-        box.classList.remove('hidden');
-    } else {
-        box.classList.add('hidden');
-    }
-}
-
-async function cargarEpisodios(id, sNum, serieTitle, poster) {
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${sNum}?api_key=${KEYS.tmdb}&language=${idiomaActual}-${idiomaActual.toUpperCase()}`);
-    const data = await res.json();
-    document.getElementById('episodes-list').innerHTML = data.episodes.map(e => `
-        <div class="bg-white/5 p-3 rounded-lg flex justify-between items-center hover:bg-white/10 cursor-pointer" onclick="guardarHistorial(${id}, '${serieTitle}', '${poster}', 'tv'); lanzarReproductor(${id}, 'tv', ${sNum}, ${e.episode_number})">
-            <span class="text-xs"><b class="mr-2">${e.episode_number}.</b> ${e.name}</span>
-            <span class="text-[10px] text-cyan-400 uppercase font-bold">${t('play')}</span>
-        </div>
-    `).join('');
-    document.getElementById('episodes-container').classList.remove('hidden');
-}
-
-function lanzarReproductor(id, tipo, s=1, e=1) {
+async function lanzarReproductor(id, tipo, s = 1, e = 1) {
     const selector = document.getElementById('server-selector');
+    const videoRoot = document.getElementById('video-root');
+    
     document.getElementById('player-view').classList.remove('hidden');
     document.getElementById('series-modal').classList.add('hidden');
+    
+    // Estado de carga inicial en los servidores
+    selector.innerHTML = `<div class="text-xs text-cyan-400 p-2 animate-pulse">Sincronizando con tu nube Real-Debrid...</div>`;
+    videoRoot.innerHTML = `<div class="flex items-center justify-center h-full text-zinc-500 text-xs">Cargando flujo privado...</div>`;
 
-    const servidores = [
-        { pais: "🇲🇽", nombre: "LATINO 1", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
-        { pais: "🇪🇸", nombre: "CASTELLANO", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` },
-        { pais: "🌐", nombre: "FILEMOON", url: tipo === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` }
-    ];
+    try {
+        // 1. Consultamos los torrents/archivos directamente desde la API REST de Real-Debrid
+        const response = await fetch(`https://api.real-debrid.com/rest/1.0/torrents`, {
+            headers: { "Authorization": `Bearer ${REAL_DEBRID_API_KEY}` }
+        });
+        const torrents = await response.json();
 
-    selector.innerHTML = servidores.map(serv => `
-        <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-2 bg-zinc-900 border border-white/10 p-2 rounded-xl text-left hover:border-white">
-            <span class="text-lg">${serv.pais}</span>
-            <div class="text-[10px] font-black uppercase">${serv.nombre}</div>
-        </button>
-    `).join('');
+        if (!torrents || torrents.length === 0) {
+            throw new Error("No hay torrents en la nube");
+        }
 
-    cambiarServidor(servidores[0].url);
+        // 2. Tomamos los enlaces disponibles y generamos los botones de reproducción directa
+        let servidoresHTML = '';
+        let primerEnlaceValido = '';
+
+        // Mostramos servidores por defecto (Latino/Castellano) y añadimos tus streams de Real-Debrid
+        const servidoresBase = [
+            { pais: "🇲🇽", nombre: "LATINO (Cloud)", url: tipo === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+            { pais: "🇪🇸", nombre: "CASTELLANO (Cloud)", url: tipo === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` }
+        ];
+
+        servidoresBase.forEach(serv => {
+            servidoresHTML += `
+                <button onclick="cambiarServidor('${serv.url}')" class="flex items-center gap-2 bg-zinc-900 border border-white/10 p-2 rounded-xl text-left hover:border-cyan-400 transition-all">
+                    <span class="text-lg">${serv.pais}</span>
+                    <div class="text-[10px] font-black uppercase">${serv.nombre}</div>
+                </button>
+            `;
+        });
+
+        // Si existen archivos en tu nube de Real-Debrid, los listamos como opciones directas de máxima calidad
+        if (torrents.length > 0 && torrents[0].links && torrents[0].links.length > 0) {
+            // Desbloqueamos el primer enlace de tu nube para tener reproducción inmediata
+            const linkRestringido = torrents[0].links[0];
+            const unrestrictRes = await fetch(`https://api.real-debrid.com/rest/1.0/unrestrict/link`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${REAL_DEBRID_API_KEY}`,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ "link": linkRestringido })
+            });
+            const unrestrictData = await unrestrictRes.json();
+            if (unrestrictData.download) {
+                primerEnlaceValido = unrestrictData.download;
+                servidoresHTML += `
+                    <button onclick="cambiarServidorDirecto('${unrestrictData.download}')" class="flex items-center gap-2 bg-cyan-950/40 border border-cyan-500/30 p-2 rounded-xl text-left hover:border-cyan-400 transition-all">
+                        <span class="text-lg">⚡</span>
+                        <div class="text-[10px] font-black uppercase text-cyan-400">Real-Debrid 4K / Multiaudio</div>
+                    </button>
+                `;
+            }
+        }
+
+        selector.innerHTML = servidoresHTML;
+        
+        // Iniciamos por defecto con el primer servidor disponible
+        cambiarServidor(servidoresBase[0].url);
+
+    } catch (error) {
+        console.error("Error al conectar con Real-Debrid:", error);
+        // Fallback a servidores web si falla la API
+        selector.innerHTML = `
+            <button onclick="cambiarServidor('https://vidsrc.cc/v2/embed/movie/${id}')" class="bg-zinc-900 border border-white/10 p-2 rounded-xl text-left">
+                <div class="text-[10px] font-black uppercase">Servidor Alternativo</div>
+            </button>
+        `;
+        cambiarServidor(`https://vidsrc.cc/v2/embed/movie/${id}`);
+    }
 }
 
 function cambiarServidor(url) {
     document.getElementById('video-root').innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
 }
 
-function toggleModoCine() {
-    document.body.classList.toggle('modo-cine-activo');
-    const btn = document.getElementById('cine-btn');
-    if (document.body.classList.contains('modo-cine-activo')) {
-        btn.innerHTML = `<i class="fa-solid fa-lightbulb text-yellow-400"></i> ${t('lightsOn')}`;
-    } else {
-        btn.innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${t('cineMode')}`;
-    }
+function cambiarServidorDirecto(urlVideo) {
+    // Reproductor nativo HTML5 que permite la selección correcta de pistas de audio multilingüe
+    document.getElementById('video-root').innerHTML = `
+        <video controls autoplay class="w-full h-full object-contain bg-black">
+            <source src="${urlVideo}" type="video/mp4">
+            Tu navegador no soporta la reproducción de video directa.
+        </video>
+    `;
 }
 
-function cerrarPlayer() {
-    document.getElementById('player-view').classList.add('hidden');
-    document.getElementById('video-root').innerHTML = '';
-    document.body.classList.remove('modo-cine-activo');
-    location.reload();
-}
-
-function cerrarModalSeries() { 
-    document.getElementById('series-modal').classList.add('hidden'); 
-    document.getElementById('trailer-frame-box').innerHTML = '';
-}
 
 // Configuración de tu cuenta de Real-Debrid
 const REAL_DEBRID_API_KEY = "TU_API_KEY_DE_REAL_DEBRID"; // Pega aquí tu token
