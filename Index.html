@@ -26,3 +26,41 @@
     <p>Barcelona | Dakar | Africa | Europa | Asia | America | Estado Unides | Todo el mundo</p>
 </body>
 </html>
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Transporte - MOVE360</title>
+    <style>
+        body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+        .caja { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 10px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .boton { width: 100%; padding: 15px; background: #0056b3; color: white; border: none; border-radius: 5px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="caja">
+        <h1>🔍 Busca tu Transporte</h1>
+        <p>Rellena y te contactamos con un transportista en 5 minutos</p>
+        <form action="https://wa.me/221764937437" method="get" target="_blank">
+            <input type="text" name="origen" placeholder="¿Desde dónde?" required>
+            <input type="text" name="destino" placeholder="¿Hasta dónde?" required>
+            <select name="tipo" required>
+                <option value="">¿Qué necesitas?</option>
+                <option>Taxi</option>
+                <option>Moto</option>
+                <option>Camión</option>
+                <option>Furgoneta</option>
+            </select>
+            <input type="text" name="fecha" placeholder="Fecha y Hora">
+            <button type="submit" class="boton">📲 PEDIR POR WHATSAPP</button>
+        </form>
+        <a href="index.html">← Volver al inicio</a>
+    </div>
+</body>
+</html>
+<a href="registro.html" class="boton">🚗 REGÍSTRATE COMO TRANSPORTISTA</a>
+<a href="buscar.html" class="boton">🔍 BUSCO TRANSPORTE</a>
