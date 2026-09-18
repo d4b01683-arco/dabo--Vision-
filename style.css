@@ -1,0 +1,72 @@
+/* style.css - MOVE360 AFRICA */
+
+body { 
+    font-family: 'Segoe UI', Arial; 
+    text-align: center; 
+    margin: 0;
+    padding: 30px 15px;
+    background: linear-gradient(135deg, #0056b3 0%, #00C896 100%);
+    background-attachment: fixed;
+    color: white;
+}
+
+.caja { 
+    background: rgba(255, 255, 255, 0.95);
+    max-width: 450px;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    color: #333;
+}
+
+h1 { 
+    color: white; 
+    font-size: 36px; 
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    margin-bottom: 5px;
+}
+
+.boton { 
+    display: block; 
+    width: 90%; 
+    max-width: 350px; 
+    margin: 15px auto; 
+    padding: 18px; 
+    background: linear-gradient(90deg, #0056b3, #004494);
+    color: white; 
+    text-decoration: none; 
+    font-size: 18px; 
+    border-radius: 12px; 
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,86,179,0.4);
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.boton:hover { 
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,86,179,0.6);
+}
+
+.boton-pago { 
+    background: linear-gradient(90deg, #00C896, #009970);
+    box-shadow: 0 4px 15px rgba(0,200,150,0.4);
+}
+.boton-orange { 
+    background: linear-gradient(90deg, #FF7900, #E56E00);
+    box-shadow: 0 4px 15px rgba(255,121,0,0.4);
+}
+.boton-stripe { 
+    background: linear-gradient(90deg, #635BFF, #5249D9);
+    box-shadow: 0 4px 15px rgba(99,91,255,0.4);
+}
+
+.caja-pago {
+    background: white; 
+    padding: 20px; 
+    border-radius: 15px; 
+    margin: 20px auto; 
+    max-width: 350px;
+    border: 2px solid #00C896;
+}
